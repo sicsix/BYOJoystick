@@ -80,11 +80,11 @@ namespace BYOJoystick.Controls
                 var syncWrapper = isSideJoystickActive ? SideJoystickSyncWrapper : CenterJoystickSyncWrapper;
                 var grabHandler = isSideJoystickActive ? SideJoystickGrabHandler : CenterJoystickGrabHandler;
 
-                float prMagnitude = new Vector2(JoystickVector.x, JoystickVector.z).magnitude;
+                float magnitude = Mathf.Max(new Vector2(JoystickVector.x, JoystickVector.z).magnitude, Mathf.Abs(JoystickVector.y));
 
-                if (!grabHandler.IsGrabbed && prMagnitude > 0.20f)
+                if (!grabHandler.IsGrabbed && magnitude > 0.20f)
                     grabHandler.GrabStick();
-                else if (grabHandler.IsGrabbed && prMagnitude < 0.03f)
+                else if (grabHandler.IsGrabbed && magnitude < 0.03f)
                     grabHandler.ReleaseStick();
 
                 if ((syncWrapper == null || syncWrapper.TryInteractTimed(true, 0.5f)) && !GetRemoteOnly(joystick))

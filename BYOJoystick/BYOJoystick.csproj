@@ -104,7 +104,6 @@
         <Compile Include="Controls\CNone.cs"/>
         <Compile Include="Controls\CHelmet.cs"/>
         <Compile Include="Controls\CHSI.cs"/>
-        <Compile Include="Controls\CJettison.cs"/>
         <Compile Include="Controls\CJoystick.cs"/>
         <Compile Include="Controls\CKnob.cs"/>
         <Compile Include="Controls\CKnobInt.cs"/>

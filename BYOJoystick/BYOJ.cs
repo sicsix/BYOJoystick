@@ -429,16 +429,16 @@ namespace BYOJoystick
             if (BYOJUI.IsBinding)
                 return;
 
+            bool isAnyModifierPressed = Input.GetKey(KeyCode.LeftShift)
+                                     || Input.GetKey(KeyCode.RightShift)
+                                     || Input.GetKey(KeyCode.LeftControl)
+                                     || Input.GetKey(KeyCode.RightControl)
+                                     || Input.GetKey(KeyCode.LeftAlt)
+                                     || Input.GetKey(KeyCode.RightAlt);
+
             for (int i = 0; i < ActiveKeyboardBindings.Count; i++)
             {
-                var binding = ActiveKeyboardBindings[i];
-                bool isAnyModifierPressed = Input.GetKey(KeyCode.LeftShift)
-                                         || Input.GetKey(KeyCode.RightShift)
-                                         || Input.GetKey(KeyCode.LeftControl)
-                                         || Input.GetKey(KeyCode.RightControl)
-                                         || Input.GetKey(KeyCode.LeftAlt)
-                                         || Input.GetKey(KeyCode.RightAlt);
-                binding.UpdateState(isAnyModifierPressed);
+                ActiveKeyboardBindings[i].UpdateState(isAnyModifierPressed);
             }
         }
     }

@@ -172,5 +172,15 @@ namespace BYOJoystick.Config
                 toStore.GetJoystickBindings(binding.JoystickId).Add(binding.Target, newBinding);
             }
         }
+
+        public void ClearBindings()
+        {
+            foreach (var vehicleBindingStore in _vehicleBindingStores.Values)
+            {
+                vehicleBindingStore.ClearAll();
+            }
+
+            _vehicleBindingStores.Clear();
+        }
     }
 }

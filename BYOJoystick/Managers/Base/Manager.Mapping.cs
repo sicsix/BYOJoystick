@@ -228,7 +228,7 @@ namespace BYOJoystick.Managers.Base
                 VRTwistKnob twistKnob              => new CKnob(interactable, twistKnob),
                 VRTwistKnobInt twistKnobInt        => new CKnobInt(interactable, twistKnobInt),
                 VRButton button                    => new CButton(interactable, button),
-                VRThrottle throttle                => new CThrottle(interactable, throttle, IsMulticrew),
+                VRThrottle throttle                => new CThrottle(Vehicle, interactable, throttle, IsMulticrew),
                 VRDoor door                        => new CDoor(interactable, door),
                 MFDPortalPresetButton presetButton => new CPresetButton(presetButton, MFDPortalManagers.Length > 0 ? MFDPortalManagers[0] : null),
                 APKnobAltAdjust altKnob            => new CAltAdjust(altKnob),
@@ -315,7 +315,7 @@ namespace BYOJoystick.Managers.Base
             var centerStickRoot = centerStickRootPath != null ? GetGameObject(centerStickRootPath) : null;
             var sideStick       = FindComponent<VRJoystick>(sideStickRoot);
             var centerStick     = centerStickRootPath != null ? FindComponent<VRJoystick>(centerStickRoot) : null;
-            var control         = new CJoystick(sideStick, centerStick, IsMulticrew);
+            var control         = new CJoystick(Vehicle, sideStick, centerStick, IsMulticrew);
             Controls.Add(name, control);
             return control;
         }
@@ -360,7 +360,7 @@ namespace BYOJoystick.Managers.Base
             var throttle       = FindComponent<VRThrottle>(Vehicle);
             var interactable   = GetInteractable(throttle);
             var tiltController = FindComponent<TiltController>(Vehicle);
-            var control        = new CThrottleTilt(interactable, throttle, tiltController, IsMulticrew);
+            var control        = new CThrottleTilt(Vehicle, interactable, throttle, tiltController, IsMulticrew);
             Controls.Add(name, control);
             return control;
         }

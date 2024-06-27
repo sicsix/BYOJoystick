@@ -1,28 +1,27 @@
 using System.Collections;
 using System.IO;
 using System.Reflection;
+using ModLoader.Framework;
+using ModLoader.Framework.Attributes;
+using System.Reflection;
 using Harmony;
 using UnityEngine;
 
 namespace BYOJoystick
 {
-    public class Plugin : VTOLMOD
+    [ItemId("BYOJ")]
+    public class Plugin : VtolMod
     {
-        private static Plugin _instance;
-
-        public new static void Log(object msg)
+        public BYOJ BYOJ;
+        
+        public static void Log(object msg)
         {
-            if (_instance != null)
-                ((VTOLMOD)_instance).Log(msg);
-            else
-                Debug.Log($"[BYOJ] {msg}");
+            Debug.Log($"[BYOJ] {msg}");
         }
 
-        public override void ModLoaded()
+        private void Awake()
         {
-            _instance = this;
             Log("Loading BYO Joystick Plugin");
-            base.ModLoaded();
             
             Log("Creating Harmony Patches");
             HarmonyInstance.Create("com.BYOJoystick").PatchAll(Assembly.GetExecutingAssembly());
@@ -33,12 +32,7 @@ namespace BYOJoystick
         private IEnumerator LoadAssetBundle()
         {
             Log("Loading Asset Bundle...");
-            string path = Directory.GetCurrentDirectory() + @"\VTOLVR_ModLoader\mods\BYO_Joystick\byoj";
-            if (!File.Exists(path))
-            {
-                Log("Loading from dev path...");
-                path = @"D:\Projects\VTOLVR\My Mods\BYO Joystick\Builds\byoj";
-            }
+            string path = $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\byoj";
 
             if (!File.Exists(path))
             {
@@ -62,14 +56,22 @@ namespace BYOJoystick
             if (prefab != null)
             {
                 Log("Loaded prefab from Asset Bundle");
-                var byoj = Instantiate(prefab, transform.position, transform.rotation);
-                DontDestroyOnLoad(byoj);
+                BYOJ = Instantiate(prefab, transform.position, transform.rotation).GetComponent<BYOJ>();
+                DontDestroyOnLoad(BYOJ);
                 Log("BYOJ Started!");
             }
             else
                 Log("Failed to load prefab from Asset Bundle");
 
             bundle.Unload(false);
+        }
+
+        public override void UnLoad()
+        {
+            Log("Unloading BYO Joystick Plugin");
+            BYOJ.Unload();
+            Destroy(BYOJ.gameObject);
+            Destroy(this);
         }
     }
 }

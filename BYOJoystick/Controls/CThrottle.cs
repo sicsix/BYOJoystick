@@ -38,7 +38,7 @@ namespace BYOJoystick.Controls
 
         protected readonly DigitalToAxisSmoothed ThrottleSmoothed = new DigitalToAxisSmoothed(0.25f, 1f, 2f);
 
-        public CThrottle(VRInteractable interactable, VRThrottle throttle, bool isMulticrew)
+        public CThrottle(GameObject vehicle, VRInteractable interactable, VRThrottle throttle, bool isMulticrew)
         {
             IsMP                = VTOLMPUtils.IsMultiplayer();
             IsMulticrew         = isMulticrew;
@@ -57,8 +57,8 @@ namespace BYOJoystick.Controls
             GetRemoteOnly = CompiledExpressions.CreateFieldGetter<VRThrottle, bool>("remoteOnly");
             var throttleInteractable = throttle.GetComponent<VRInteractable>();
             SyncWrapper = InteractableSyncWrapper.Create(Interactable);
-            var connectedThrottles = VTOLAPI.GetPlayersVehicleGameObject().GetComponentsInChildren<ConnectedThrottles>().FirstOrDefault(o => o.throttles.Contains(throttle));
-            var muvs               = VTOLAPI.GetPlayersVehicleGameObject().GetComponent<MultiUserVehicleSync>();
+            var connectedThrottles = vehicle.GetComponentsInChildren<ConnectedThrottles>().FirstOrDefault(o => o.throttles.Contains(throttle));
+            var muvs               = vehicle.GetComponent<MultiUserVehicleSync>();
             GrabHandler = ThrottleGrabHandler.Create(Throttle, connectedThrottles, muvs, throttleInteractable);
         }
 

@@ -43,7 +43,7 @@ namespace BYOJoystick.Controls
         protected readonly DigitalToAxisSmoothed ThumbstickXSmoothed = new DigitalToAxisSmoothed(0.25f, 1f, 1f);
         protected readonly DigitalToAxisSmoothed ThumbstickYSmoothed = new DigitalToAxisSmoothed(0.25f, 1f, 1f);
 
-        public CJoystick(VRJoystick sideJoystick, VRJoystick centerJoystick, bool isMulticrew, bool hasJoystickAxes)
+        public CJoystick(GameObject vehicle, VRJoystick sideJoystick, VRJoystick centerJoystick, bool isMulticrew, bool hasJoystickAxes)
         {
             Instances.Add(this);
             IsMP                                  = VTOLMPUtils.IsMultiplayer();
@@ -60,8 +60,8 @@ namespace BYOJoystick.Controls
                 return;
             GetRemoteOnly = CompiledExpressions.CreateFieldGetter<VRJoystick, bool>("remoteOnly");
 
-            var connectedJoysticks = VTOLAPI.GetPlayersVehicleGameObject().GetComponentInChildren<ConnectedJoysticks>();
-            var muvs               = VTOLAPI.GetPlayersVehicleGameObject().GetComponent<MultiUserVehicleSync>();
+            var connectedJoysticks = vehicle.GetComponentInChildren<ConnectedJoysticks>();
+            var muvs               = vehicle.GetComponent<MultiUserVehicleSync>();
 
             var sideJoystickInteractable = sideJoystick.GetComponent<VRInteractable>();
             SideJoystickSyncWrapper = InteractableSyncWrapper.Create(sideJoystickInteractable);

@@ -11,7 +11,11 @@ namespace BYOJoystick.Controls
         protected          float                 TiltTarget;
         protected          bool                  TiltTargetReached = true;
 
-        public CThrottleTilt(VRInteractable interactable, VRThrottle throttle, TiltController tiltController, bool isMulticrew) : base(interactable, throttle, isMulticrew)
+        public CThrottleTilt(GameObject     vehicle,
+                             VRInteractable interactable,
+                             VRThrottle     throttle,
+                             TiltController tiltController,
+                             bool           isMulticrew) : base(vehicle, interactable, throttle, isMulticrew)
         {
             TiltController = tiltController;
         }

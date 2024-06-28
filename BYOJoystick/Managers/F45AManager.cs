@@ -9,10 +9,11 @@ namespace BYOJoystick.Managers
         public override string GameName    => "F-45A";
         public override string ShortName   => "F45A";
         public override bool   IsMulticrew => false;
-
+        
         private static string SideJoystick   => "Local/JoystickObjects/SideStickObjects";
         private static string CenterJoystick => "Local/JoystickObjects/CenterStickObjects";
-
+        private static string TSD            => "Local/DashCanvas/Dash/touchScreenArea/MFDPortals/poweredObj/TacticalSituationDisplay";
+        
         private CJoystick Joysticks(string name, string root, bool nullable, int idx)
         {
             return GetJoysticksByPaths(name, SideJoystick, CenterJoystick);
@@ -164,6 +165,9 @@ namespace BYOJoystick.Managers
 
             DisplayButton("SOI Zoom In", "SOI", SOI, CSOI.ZoomIn);
             DisplayButton("SOI Zoom Out", "SOI", SOI, CSOI.ZoomOut);
+
+            DisplayButton("TSD Slew TGP/EOTS", "Slew EOTS", ByName<VRInteractable, CInteractable>, CInteractable.Use, r: TSD);
+            DisplayButton("TSD GPS-S", "GPS Send", ByName<VRInteractable, CInteractable>, CInteractable.Use, r: TSD);
 
             DisplayAxis("MFD Brightness", "MFD Brightness", ByManifest<VRTwistKnob, CKnob>, CKnob.Set, i: 0);
             DisplayButton("MFD Brightness Increase", "MFD Brightness", ByManifest<VRTwistKnob, CKnob>, CKnob.Increase, i: 0);

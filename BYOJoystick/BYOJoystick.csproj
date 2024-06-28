@@ -1,19 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{7BB21F11-6675-4E25-AB78-E420A6B129C2}</ProjectGuid>
         <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>BYOJoystick</RootNamespace>
         <AssemblyName>BYOJoystick</AssemblyName>
-        <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-        <FileAlignment>512</FileAlignment>
-        <Deterministic>true</Deterministic>
+        <TargetFramework>net461</TargetFramework>
         <LangVersion>8</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Deterministic>true</Deterministic>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <DebugSymbols>true</DebugSymbols>
@@ -78,80 +73,7 @@
             <HintPath>..\Dependencies\UnityEngine.UI.dll</HintPath>
         </Reference>
     </ItemGroup>
-    <ItemGroup>
-        <Compile Include="Actions\ActionCategory.cs"/>
-        <Compile Include="Actions\ActionInput.cs"/>
-        <Compile Include="Actions\ControlAction.cs"/>
-        <Compile Include="Bindings\Binding.cs"/>
-        <Compile Include="Bindings\JoystickBinding.cs"/>
-        <Compile Include="Bindings\KeyboardBinding.cs"/>
-        <Compile Include="Bindings\POVFacing.cs"/>
-        <Compile Include="BYOJ.cs"/>
-        <Compile Include="BYOJJoystick.cs"/>
-        <Compile Include="CompiledExpressions.cs"/>
-        <Compile Include="Config\BindingStore.cs"/>
-        <Compile Include="Config\ConfigManager.cs"/>
-        <Compile Include="Config\VehicleBindingStore.cs"/>
-        <Compile Include="Controls\CAltAdjust.cs"/>
-        <Compile Include="Controls\CButton.cs"/>
-        <Compile Include="Controls\CCMS.cs"/>
-        <Compile Include="Controls\CCollFuncs.cs"/>
-        <Compile Include="Controls\CDashRWR.cs"/>
-        <Compile Include="Controls\CDoor.cs"/>
-        <Compile Include="Controls\CEF24Hotas.cs"/>
-        <Compile Include="Controls\CEject.cs"/>
-        <Compile Include="Controls\CInteractable.cs"/>
-        <Compile Include="Controls\CNone.cs"/>
-        <Compile Include="Controls\CHelmet.cs"/>
-        <Compile Include="Controls\CHSI.cs"/>
-        <Compile Include="Controls\CJoystick.cs"/>
-        <Compile Include="Controls\CKnob.cs"/>
-        <Compile Include="Controls\CKnobInt.cs"/>
-        <Compile Include="Controls\CLever.cs"/>
-        <Compile Include="Controls\CMFD.cs"/>
-        <Compile Include="Controls\CMMFD.cs"/>
-        <Compile Include="Controls\CPresetButton.cs"/>
-        <Compile Include="Controls\CRadarPower.cs"/>
-        <Compile Include="Controls\CSweep.cs"/>
-        <Compile Include="Controls\CUFD.cs"/>
-        <Compile Include="Controls\Converters\DigitalToAxisSmoothed.cs"/>
-        <Compile Include="Controls\CRadio.cs"/>
-        <Compile Include="Controls\CSOI.cs"/>
-        <Compile Include="Controls\CSpdAdjust.cs"/>
-        <Compile Include="Controls\CThrottle.cs"/>
-        <Compile Include="Controls\CThrottleTilt.cs"/>
-        <Compile Include="Controls\CVehicleMaster.cs"/>
-        <Compile Include="Controls\IControl.cs"/>
-        <Compile Include="Controls\Sync\InteractableSyncWrapper.cs"/>
-        <Compile Include="Controls\Sync\JoystickGrabHandler.cs"/>
-        <Compile Include="Controls\Sync\ThrottleGrabHandler.cs"/>
-        <Compile Include="Managers\AH94FrontManager.cs"/>
-        <Compile Include="Managers\AH94RearManager.cs"/>
-        <Compile Include="Managers\AV42CManager.cs"/>
-        <Compile Include="Managers\Base\Manager.Actions.cs"/>
-        <Compile Include="Managers\Base\Manager.Mapping.cs"/>
-        <Compile Include="Managers\Base\Manager.cs"/>
-        <Compile Include="Managers\EF24GFrontManager.cs"/>
-        <Compile Include="Managers\EF24GRearManager.cs"/>
-        <Compile Include="Managers\F45AManager.cs"/>
-        <Compile Include="Managers\FA26BManager.cs"/>
-        <Compile Include="Managers\T55FrontManager.cs"/>
-        <Compile Include="Managers\T55RearManager.cs"/>
-        <Compile Include="Plugin.cs"/>
-        <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="UI\BYOJBindingModal.cs"/>
-        <Compile Include="UI\BYOJUI.cs"/>
-        <Compile Include="UI\Scripts\BindingCell.cs"/>
-        <Compile Include="UI\Scripts\ButtonBinding.cs"/>
-        <Compile Include="UI\Scripts\CategoryActions.cs"/>
-        <Compile Include="UI\Scripts\ScrollRectSync.cs"/>
-        <Compile Include="UI\Scripts\VehicleSelector.cs"/>
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
-    <PropertyGroup>
-        <PostBuildEvent>IF EXIST "C:\Program Files (x86)\Steam\steamapps\common\VTOL VR\VTOLVR_ModLoader\VTOLVR-ModLoader.exe" (
-            copy "$(TargetPath)" "D:\Projects\VTOLVR\My Mods\BYO Joystick\Builds\BYOJoystick.dll"
-            )
-        </PostBuildEvent>
-    </PropertyGroup>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command='copy "$(TargetPath)" "D:\Projects\VTOLVR\My Mods\BYO Joystick\Builds\BYOJoystick.dll"'/>
+    </Target>
 </Project>

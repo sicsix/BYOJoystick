@@ -359,7 +359,9 @@ namespace BYOJoystick.Managers
             if (statusPageButton == null)
                 throw new InvalidOperationException("Could not find UFD status page button");
 
-            return new CUFD(switcher, powerUnit, powerButton, fuelPageButton, apPageButton, statusPageButton);
+            var cufd = new CUFD(switcher, powerUnit, powerButton, fuelPageButton, apPageButton, statusPageButton);
+            Controls.Add(name, cufd);
+            return cufd;
         }
     }
 }

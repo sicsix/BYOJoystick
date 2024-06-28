@@ -17,6 +17,7 @@ namespace BYOJoystick.Managers
         private static string Seat           => "FrontSeatParent";
         private static string SideJoystick   => "PassengerOnlyObjs/FrontCockpit/SideStickObjects (Front)";
         private static string CenterJoystick => "PassengerOnlyObjs/FrontCockpit/CenterStickObjects (Front)";
+        private static string TSD            => "PassengerOnlyObjs/FrontCockpit/DashTransform/touchScreenArea/MFDPortals/poweredObj/-- pages --/TacticalSituationDisplay";
 
         private CJoystick Joysticks(string name, string root, bool nullable, int idx)
         {
@@ -120,8 +121,9 @@ namespace BYOJoystick.Managers
             SystemsButton("Master Mode WPN", "Master Mode (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 0, i: 8);
             SystemsButton("Master Mode EW", "Master Mode (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, 1, i: 8);
 
-            SystemsButton("Arming Mode AA", "AA Mode", ByName<VRButton, CButton>, CButton.Use, r: Cockpit);
-            SystemsButton("Arming Mode AG", "AG Mode", ByName<VRButton, CButton>, CButton.Use, r: Cockpit);
+            SystemsButton("Arming Mode Toggle", "EF24Hotas", EF24Hotas, CEF24Hotas.ToggleArmingMode);
+            SystemsButton("Arming Mode AA", "EF24Hotas", EF24Hotas, CEF24Hotas.ArmingAA);
+            SystemsButton("Arming Mode AG", "EF24Hotas", EF24Hotas, CEF24Hotas.ArmingAG);
 
             SystemsButton("Fire Weapon", "Joystick", Joysticks, CJoystick.Trigger);
             SystemsButton("Cycle Weapons", "Joystick", Joysticks, CJoystick.MenuButton);
@@ -135,12 +137,12 @@ namespace BYOJoystick.Managers
             SystemsButton("Chaff On", "CMSConfigUI", ByType<CMSConfigUI, CCMS>, CCMS.ChaffOn);
             SystemsButton("Chaff Off", "CMSConfigUI", ByType<CMSConfigUI, CCMS>, CCMS.ChaffOff);
 
-            SystemsButton("Tx Cycle EM Band", "EF24Hotas", ByType<EF24Hotas, CEF24Hotas>, CEF24Hotas.CycleEMBand);
-            SystemsButton("Tx Cycle Mode", "EF24Hotas", ByType<EF24Hotas, CEF24Hotas>, CEF24Hotas.CycleTxMode);
-            SystemsButton("Tx Next", "EF24Hotas", ByType<EF24Hotas, CEF24Hotas>, CEF24Hotas.NextTx);
-            SystemsButton("Tx Prev", "EF24Hotas", ByType<EF24Hotas, CEF24Hotas>, CEF24Hotas.PrevTx);
-            SystemsButton("Tx Power Increase", "EF24Hotas", ByType<EF24Hotas, CEF24Hotas>, CEF24Hotas.IncreaseTxPower);
-            SystemsButton("Tx Power Decrease", "EF24Hotas", ByType<EF24Hotas, CEF24Hotas>, CEF24Hotas.DecreaseTxPower);
+            SystemsButton("Tx Cycle EM Band", "EF24Hotas", EF24Hotas, CEF24Hotas.CycleEMBand);
+            SystemsButton("Tx Cycle Mode", "EF24Hotas", EF24Hotas, CEF24Hotas.CycleTxMode);
+            SystemsButton("Tx Next", "EF24Hotas", EF24Hotas, CEF24Hotas.NextTx);
+            SystemsButton("Tx Prev", "EF24Hotas", EF24Hotas, CEF24Hotas.PrevTx);
+            SystemsButton("Tx Power Increase", "EF24Hotas", EF24Hotas, CEF24Hotas.IncreaseTxPower);
+            SystemsButton("Tx Power Decrease", "EF24Hotas", EF24Hotas, CEF24Hotas.DecreaseTxPower);
 
             SystemsButton("Engine Left Toggle", "Engine L (Front)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 13);
             SystemsButton("Engine Left On", "Engine L (Front)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 13);
@@ -210,6 +212,9 @@ namespace BYOJoystick.Managers
 
             DisplayButton("SOI Zoom In", "SOI", SOI, CSOI.ZoomIn);
             DisplayButton("SOI Zoom Out", "SOI", SOI, CSOI.ZoomOut);
+            
+            DisplayButton("TSD Slew TGP/EOTS", "Slew TGP", TSDInteractable, CInteractable.Use, r: TSD);
+            DisplayButton("TSD GPS-S", "GPS Send", TSDInteractable, CInteractable.Use, r: TSD);
 
             DisplayAxis("MFD Brightness", "MFD Brightness (Front)", ByManifest<VRTwistKnob, CKnob>, CKnob.Set, i: 5);
             DisplayButton("MFD Brightness Increase", "MFD Brightness (Front)", ByManifest<VRTwistKnob, CKnob>, CKnob.Increase, i: 5);
@@ -331,6 +336,29 @@ namespace BYOJoystick.Managers
             MiscButton("Jettison Mark All", "Jettison Switch", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 0, i: 4);
             MiscButton("Jettison Mark Ext", "Jettison Switch", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 4);
             MiscButton("Jettison Mark Sel", "Jettison Switch", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 2, i: 4);
+        }
+
+        private CEF24Hotas EF24Hotas(string name, string root, bool nullable, int idx)
+        {
+            if (TryGetExistingControl<CEF24Hotas>(name, out var existingControl))
+                return existingControl;
+            var ef24Hotas         = FindComponent<EF24Hotas>(Vehicle);
+            var setArmingAAButton = ByName<VRButton, CButton>("AA Mode", Cockpit, false, -1);
+            var setArmingAGButton = ByName<VRButton, CButton>("AG Mode", Cockpit, false, -1);
+            var cEF24Hotas        = new CEF24Hotas(ef24Hotas, setArmingAAButton, setArmingAGButton);
+            Controls.Add(name, cEF24Hotas);
+            return cEF24Hotas;
+        }
+        
+        private CInteractable TSDInteractable(string name, string root, bool nullable, int idx)
+        {
+            if (TryGetExistingControl<CInteractable>(name, out var existingControl))
+                return existingControl;
+            var tsd           = FindComponent<MFDPTacticalSituationDisplay>(Vehicle);
+            var interactable  = FindInteractable(name, tsd.GetComponentsInChildren<VRInteractable>(true));
+            var cInteractable = new CInteractable(interactable);
+            Controls.Add(name, cInteractable);
+            return cInteractable;
         }
     }
 }

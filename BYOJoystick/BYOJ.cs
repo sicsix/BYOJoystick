@@ -38,6 +38,8 @@ namespace BYOJoystick
 
         private static ABObjectToggler _spSeatSwitcher;
 
+        private static readonly Func<List<ScreenFader>> GetScreenFaders = CompiledExpressions.CreateStaticFieldGetter<ScreenFader, List<ScreenFader>>("instances");
+
         private class InputEvent
         {
             public Action<int, bool> Callback;
@@ -176,8 +178,23 @@ namespace BYOJoystick
                 return;
             }
 
-            if (ActiveManager == null || (ActiveManager != null && !VTOLMPUtils.IsMultiplayer() && ActiveManager.IsMulticrew && _spSeatSwitcher.isA != ActiveManager.IsSeatA))
-                SelectManager();
+            if (VTOLMPUtils.IsMultiplayer())
+            {
+                var screenFaders = GetScreenFaders();
+                if (screenFaders == null || screenFaders.Count < 2)
+                    return;
+                
+                if (screenFaders[1].canvasObject.activeSelf)
+                {
+                    if (ActiveManager != null)
+                        ClearActiveManager();
+                    return;
+                }
+                if (ActiveManager == null)
+                    SelectManagerMultiPlayer();
+            }
+            else if (ActiveManager == null || (ActiveManager != null && ActiveManager.IsMulticrew && _spSeatSwitcher.isA != ActiveManager.IsSeatA))
+                SelectManagerSinglePlayer();
         }
 
         public static bool IsFlyingScene()
@@ -186,7 +203,34 @@ namespace BYOJoystick
             return buildIndex == 7 || buildIndex == 11 || Application.isEditor;
         }
 
-        private static void SelectManager()
+        private static void SelectManagerMultiPlayer()
+        {
+            Plugin.Log("Selecting manager");
+            var playerVehicleMaster = FlightSceneManager.instance?.playerVehicleMaster;
+            if (playerVehicleMaster == null)
+                return;
+            Plugin.Log("Found player vehicle master");
+            var playerVehicle = playerVehicleMaster.playerVehicle;
+            if (playerVehicle == null)
+                return;
+            Plugin.Log("Found vehicle");
+            var vehicle = playerVehicleMaster.gameObject;
+            if (vehicle == null)
+                return;
+            Plugin.Log("Selecting multiplayer manager");
+            var player = VTOLMPSceneManager.instance.localPlayer;
+            if (player == null)
+                return;
+            Plugin.Log($"Got local player {player.pilotName}");
+            var slot = VTOLMPSceneManager.instance.GetSlot(player);
+            if (slot == null)
+                return;
+            Plugin.Log($"Got seat index {slot.crewSeatIdx}");
+            string shortName = GetShortName(playerVehicle.vehicleName, slot.crewSeatIdx == 0);
+            SetActiveManager(GetManager(shortName), vehicle);
+        }
+
+        private static void SelectManagerSinglePlayer()
         {
             Plugin.Log("Selecting manager");
             var playerVehicleMaster = FlightSceneManager.instance?.playerVehicleMaster;
@@ -201,29 +245,6 @@ namespace BYOJoystick
             if (vehicle == null)
                 return;
 
-            if (VTOLMPUtils.IsMultiplayer())
-                SelectManagerMultiPlayer(playerVehicle, vehicle);
-            else
-                SelectManagerSinglePlayer(playerVehicle, vehicle);
-        }
-
-        private static void SelectManagerMultiPlayer(PlayerVehicle playerVehicle, GameObject vehicle)
-        {
-            Plugin.Log("Selecting multiplayer manager");
-            var player = VTOLMPSceneManager.instance.localPlayer;
-            if (player == null)
-                return;
-            Plugin.Log($"Got local player {player.pilotName}");
-            var slot = VTOLMPSceneManager.instance.GetSlot(player);
-            if (slot == null)
-                return;
-            Plugin.Log($"Got seat index {slot.crewSeatIdx}");
-            string shortName = GetShortName(playerVehicle.vehicleName, slot.crewSeatIdx == 0);
-            SetActiveManager(GetManager(shortName), vehicle);
-        }
-
-        private static void SelectManagerSinglePlayer(PlayerVehicle playerVehicle, GameObject vehicle)
-        {
             var pilotSwitcher = FindObjectOfType<AH94PilotSwitcher>();
             if (pilotSwitcher == null)
             {

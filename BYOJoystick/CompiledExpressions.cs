@@ -17,6 +17,16 @@ namespace BYOJoystick
             return lambda.Compile();
         }
 
+        public static Func<TField> CreateStaticFieldGetter<TClass, TField>(string fieldName)
+        {
+            var fieldInfo = typeof(TClass).GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static);
+            if (fieldInfo == null)
+                throw new ArgumentException($"Field {fieldName} not found in {typeof(TClass).Name}");
+            var field  = Expression.Field(null, fieldInfo);
+            var lambda = Expression.Lambda<Func<TField>>(field);
+            return lambda.Compile();
+        }
+
         public static Action<TClass, TField> CreateFieldSetter<TClass, TField>(string fieldName)
         {
             var fieldInfo = typeof(TClass).GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);

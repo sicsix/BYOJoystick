@@ -177,7 +177,7 @@ namespace BYOJoystick.Managers.Base
             return transform.gameObject;
         }
 
-        private static VRInteractable FindInteractable(string name, VRInteractable[] interactables, bool canBeNull = false)
+        protected static VRInteractable FindInteractable(string name, VRInteractable[] interactables, bool canBeNull = false)
         {
             VRInteractable interactable = null;
             for (int i = 0; i < interactables.Length; i++)
@@ -193,7 +193,7 @@ namespace BYOJoystick.Managers.Base
             return interactable;
         }
 
-        private static T FindComponent<T>(GameObject root, bool canBeNull = false) where T : MonoBehaviour
+        protected static T FindComponent<T>(GameObject root, bool canBeNull = false) where T : MonoBehaviour
         {
             var component = root.GetComponentInChildren<T>(true);
             if (component == null && !canBeNull)
@@ -201,7 +201,7 @@ namespace BYOJoystick.Managers.Base
             return component;
         }
 
-        private static VRInteractable GetInteractable<T>(T component) where T : MonoBehaviour
+        protected static VRInteractable GetInteractable<T>(T component) where T : MonoBehaviour
         {
             var interactable = component.GetComponent<VRInteractable>();
             if (interactable == null)
@@ -210,7 +210,7 @@ namespace BYOJoystick.Managers.Base
             return interactable;
         }
 
-        private static T GetComponent<T>(VRInteractable interactable) where T : MonoBehaviour
+        protected static T GetComponent<T>(VRInteractable interactable) where T : MonoBehaviour
         {
             var component = interactable.GetComponent<T>();
             if (component == null)
@@ -244,7 +244,6 @@ namespace BYOJoystick.Managers.Base
                 DashRWR dashRWR                    => new CDashRWR(dashRWR, MFDPortalManagers.Length             > 0 ? MFDPortalManagers[0] : null),
                 MFDRadarUI radarUI                 => new CRadarPower(radarUI, MFDPortalManagers.Length          > 0 ? MFDPortalManagers[0] : null),
                 AeroGeometryLever aeroLever        => new CSweep(aeroLever),
-                EF24Hotas ef24Hotas                => new CEF24Hotas(ef24Hotas),
                 _                                  => throw new InvalidOperationException($"Control {typeof(T).Name} not supported")
             };
 

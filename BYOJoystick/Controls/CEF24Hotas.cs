@@ -7,14 +7,18 @@ namespace BYOJoystick.Controls
     public class CEF24Hotas : IControl
     {
         protected readonly EF24Hotas EF24Hotas;
+        protected readonly CButton   SetArmingAAButton;
+        protected readonly CButton   SetArmingAGButton;
         protected          bool      PowerWasZero;
 
         protected readonly DigitalToAxisSmoothed PowerSmoothed = new DigitalToAxisSmoothed(0.25f, 1f, 1f);
 
 
-        public CEF24Hotas(EF24Hotas ef24Hotas)
+        public CEF24Hotas(EF24Hotas ef24Hotas, CButton setArmingAAButton, CButton setArmingAGButton)
         {
-            EF24Hotas = ef24Hotas;
+            EF24Hotas         = ef24Hotas;
+            SetArmingAAButton = setArmingAAButton;
+            SetArmingAGButton = setArmingAGButton;
         }
 
         public void PostUpdate()
@@ -75,6 +79,32 @@ namespace BYOJoystick.Controls
                 c.PowerSmoothed.DecreaseButtonDown();
             else
                 c.PowerSmoothed.DecreaseButtonUp();
+        }
+        
+        public static void ToggleArmingMode(CEF24Hotas c, Binding binding, int state)
+        {
+            if (binding.GetAsBool())
+            {
+                if (c.EF24Hotas.armingMode == EF24Hotas.ArmingModes.AA)
+                    CButton.Use(c.SetArmingAGButton, binding, state);
+                else
+                    CButton.Use(c.SetArmingAAButton, binding, state);
+            }
+            else
+            {
+                CButton.Use(c.SetArmingAAButton, binding, state);
+                CButton.Use(c.SetArmingAGButton, binding, state);
+            }
+        }
+        
+        public static void ArmingAA(CEF24Hotas c, Binding binding, int state)
+        {
+            CButton.Use(c.SetArmingAAButton, binding, state);
+        }
+        
+        public static void ArmingAG(CEF24Hotas c, Binding binding, int state)
+        {
+            CButton.Use(c.SetArmingAGButton, binding, state);
         }
     }
 }

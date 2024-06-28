@@ -51,7 +51,7 @@ namespace BYOJoystick.Controls
         {
             if (ThrottleSmoothed.Calculate())
                 SetThrottleValue(Throttle.currentThrottle + ThrottleSmoothed.Delta);
-            else
+            else if (ThrottleValue != PreviousThrottleValue)
                 SetThrottleValue(ThrottleValue);
 
             if (DigitalThumbstickVector != Vector3.zero)

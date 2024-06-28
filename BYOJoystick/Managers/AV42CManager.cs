@@ -115,7 +115,7 @@ namespace BYOJoystick.Managers
 
         protected override void CreateSystemsControls()
         {
-            MiscButton("Clear Cautions", "Clear Cautions", ByManifest<VRButton, CButton>, CButton.Use, i: 13);
+            SystemsButton("Clear Cautions", "Clear Cautions", ByManifest<VRButton, CButton>, CButton.Use, i: 13);
 
             SystemsButton("Master Arm Toggle", "Master Arm Switch", ByManifest<VRLever, CLever>, CLever.Cycle, i: 18);
             SystemsButton("Master Arm On", "Master Arm Switch", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 18);

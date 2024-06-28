@@ -44,8 +44,8 @@ namespace BYOJoystick.Managers
             FlightButton("Flaps 3", "Flaps", ByManifest<VRLever, CLever>, CLever.Set, 2, i: 11);
 
             FlightButton("Landing Gear Toggle", "Landing Gear", ByManifest<VRLever, CLever>, CLever.Cycle, i: 10);
-            FlightButton("Landing Gear Up", "Landing Gear", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 10);
-            FlightButton("Landing Gear Down", "Landing Gear", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 10);
+            FlightButton("Landing Gear Up", "Landing Gear", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 10);
+            FlightButton("Landing Gear Down", "Landing Gear", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 10);
 
             FlightButton("Brake Lock Toggle", "Brake Locks", ByManifest<VRLever, CLever>, CLever.Cycle, i: 18);
             FlightButton("Brake Lock On", "Brake Locks", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 18);

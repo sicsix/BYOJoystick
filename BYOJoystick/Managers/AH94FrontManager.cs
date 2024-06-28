@@ -52,8 +52,8 @@ namespace BYOJoystick.Managers
             FlightButton("Trim Yaw Right", "Coll Functions", ByType<AH94CollectiveFunctions, CCollFuncs>, CCollFuncs.TrimYawRight, r: Cont);
 
             FlightButton("Landing Gear Toggle", "Landing Gear (Front)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 0);
-            FlightButton("Landing Gear Up", "Landing Gear (Front)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 0);
-            FlightButton("Landing Gear Down", "Landing Gear (Front)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 0);
+            FlightButton("Landing Gear Up", "Landing Gear (Front)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 0);
+            FlightButton("Landing Gear Down", "Landing Gear (Front)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 0);
 
             AddPostUpdateControl("Joystick");
             AddPostUpdateControl("Power Lever (Front)");

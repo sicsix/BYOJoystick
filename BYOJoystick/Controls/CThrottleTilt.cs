@@ -20,7 +20,7 @@ namespace BYOJoystick.Controls
         {
             if (ThrottleSmoothed.Calculate())
                 SetThrottleValue(Throttle.currentThrottle + ThrottleSmoothed.Delta);
-            else if (Mathf.Abs(ThrottleValue              - PreviousThrottleValue) > 0.02f)
+            else if (ThrottleValue != PreviousThrottleValue)
                 SetThrottleValue(ThrottleValue);
 
             if (TiltSmoothed.Calculate())

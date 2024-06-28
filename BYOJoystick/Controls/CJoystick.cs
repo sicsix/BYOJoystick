@@ -22,6 +22,7 @@ namespace BYOJoystick.Controls
         protected readonly JoystickGrabHandler     CenterJoystickGrabHandler;
 
         protected          Vector3                JoystickVector;
+        protected          Vector3                PreviousJoystickVector;
         protected          Vector3                ThumbstickVector;
         protected          Vector3                DigitalThumbstickVector;
         protected          bool                   ThumbstickWasZero;
@@ -69,31 +70,36 @@ namespace BYOJoystick.Controls
             bool isSideJoystickActive = SideJoystick.gameObject.activeInHierarchy;
             var  joystick             = isSideJoystickActive || !HasCenterJoystick ? SideJoystick : CenterJoystick;
 
-            if (!IsMP || !IsMulticrew)
+            if (JoystickVector != PreviousJoystickVector)
             {
-                joystick.RemoteSetStick(JoystickVector);
-                joystick.OnSetStick?.Invoke(JoystickVector);
-                joystick.OnSetSteer?.Invoke(JoystickVector.y);
-            }
-            else
-            {
-                var syncWrapper = isSideJoystickActive ? SideJoystickSyncWrapper : CenterJoystickSyncWrapper;
-                var grabHandler = isSideJoystickActive ? SideJoystickGrabHandler : CenterJoystickGrabHandler;
+                PreviousJoystickVector = JoystickVector;
 
-                float magnitude = Mathf.Max(new Vector2(JoystickVector.x, JoystickVector.z).magnitude, Mathf.Abs(JoystickVector.y));
-
-                if (!grabHandler.IsGrabbed && magnitude > 0.20f)
-                    grabHandler.GrabStick();
-                else if (grabHandler.IsGrabbed && magnitude < 0.03f)
-                    grabHandler.ReleaseStick();
-
-                if ((syncWrapper == null || syncWrapper.TryInteractTimed(true, 0.5f)) && !GetRemoteOnly(joystick))
+                if (!IsMP || !IsMulticrew)
                 {
                     joystick.RemoteSetStick(JoystickVector);
-                    if (joystick.sendEvents)
+                    joystick.OnSetStick?.Invoke(JoystickVector);
+                    joystick.OnSetSteer?.Invoke(JoystickVector.y);
+                }
+                else
+                {
+                    var syncWrapper = isSideJoystickActive ? SideJoystickSyncWrapper : CenterJoystickSyncWrapper;
+                    var grabHandler = isSideJoystickActive ? SideJoystickGrabHandler : CenterJoystickGrabHandler;
+
+                    float magnitude = Mathf.Max(new Vector2(JoystickVector.x, JoystickVector.z).magnitude, Mathf.Abs(JoystickVector.y));
+
+                    if (!grabHandler.IsGrabbed && magnitude > 0.20f)
+                        grabHandler.GrabStick();
+                    else if (grabHandler.IsGrabbed && magnitude < 0.03f)
+                        grabHandler.ReleaseStick();
+
+                    if ((syncWrapper == null || syncWrapper.TryInteractTimed(true, 0.5f)) && !GetRemoteOnly(joystick))
                     {
-                        joystick.OnSetStick?.Invoke(JoystickVector);
-                        joystick.OnSetSteer?.Invoke(JoystickVector.y);
+                        joystick.RemoteSetStick(JoystickVector);
+                        if (joystick.sendEvents)
+                        {
+                            joystick.OnSetStick?.Invoke(JoystickVector);
+                            joystick.OnSetSteer?.Invoke(JoystickVector.y);
+                        }
                     }
                 }
             }

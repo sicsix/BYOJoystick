@@ -52,8 +52,8 @@ namespace BYOJoystick.Managers
             FlightButton("Trim Yaw Right", "Coll Functions", ByType<AH94CollectiveFunctions, CCollFuncs>, CCollFuncs.TrimYawRight, r: Cont);
 
             FlightButton("Landing Gear Toggle", "Landing Gear (Rear)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 13);
-            FlightButton("Landing Gear Up", "Landing Gear (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 13);
-            FlightButton("Landing Gear Down", "Landing Gear (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 13);
+            FlightButton("Landing Gear Up", "Landing Gear (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 13);
+            FlightButton("Landing Gear Down", "Landing Gear (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 13);
 
             FlightButton("Brake Lock Toggle", "Parking Brake", ByManifest<VRLever, CLever>, CLever.Cycle, i: 12);
             FlightButton("Brake Lock On", "Parking Brake", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 12);

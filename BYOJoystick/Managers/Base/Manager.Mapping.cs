@@ -53,7 +53,10 @@ namespace BYOJoystick.Managers.Base
         {
             if (TryGetExistingControl<U>(name, out var existingControl))
                 return existingControl;
-            var interactables = root == null ? Interactables : GetGameObject(root).GetComponentsInChildren<VRInteractable>(true);
+            var rootObject =  root == null ? Vehicle : GetGameObject(root, nullable);
+            if (rootObject == null)
+                return null;
+            var interactables = rootObject == Vehicle ? Interactables : rootObject.GetComponentsInChildren<VRInteractable>(true);
             var interactable  = FindInteractable(name, interactables, nullable);
             if (interactable == null)
                 return null;
@@ -65,7 +68,9 @@ namespace BYOJoystick.Managers.Base
         {
             if (TryGetExistingControl<U>(name, out var existingControl))
                 return existingControl;
-            var rootObject = root == null ? Vehicle : GetGameObject(root);
+            var rootObject =  root == null ? Vehicle : GetGameObject(root, nullable);
+            if (rootObject == null)
+                return null;
             var component  = FindComponent<T>(rootObject, nullable);
             if (component == null)
                 return null;
@@ -169,11 +174,15 @@ namespace BYOJoystick.Managers.Base
             return false;
         }
 
-        protected GameObject GetGameObject(string name)
+        protected GameObject GetGameObject(string name, bool canBeNull = false)
         {
             var transform = Vehicle.transform.Find(name);
             if (transform == null)
+            {
+                if (canBeNull)
+                    return null;
                 throw new InvalidOperationException($"GameObject {name} not found");
+            }
             return transform.gameObject;
         }
 

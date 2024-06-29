@@ -371,7 +371,7 @@ namespace BYOJoystick.Managers
             MiscButton("Canopy Open", "Canopy (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 42);
             MiscButton("Canopy Close", "Canopy (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 42);
 
-            MiscButton("Switch Seat", "Switch Seat (Rear)", ByType<VRButton, CButton>, CButton.Use, r: Switcher);
+            MiscButton("Switch Seat", "Switch Seat (Rear)", ByType<VRButton, CButton>, CButton.Use, n: true, r: Switcher);
             MiscButton("Raise Seat", "Raise Seat", ByName<VRButton, CButton>, CButton.Use, r: Dash);
             MiscButton("Lower Seat", "Lower Seat", ByName<VRButton, CButton>, CButton.Use, r: Dash);
             MiscButton("Eject", "Eject", ByType<EjectHandle, CEject>, CEject.Pull, r: Seat);

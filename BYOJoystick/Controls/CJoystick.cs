@@ -76,7 +76,6 @@ namespace BYOJoystick.Controls
         {
             static void Prefix(int excludeIdx)
             {
-                Plugin.Log("Executing prefix patch for ConnectedJoystickSync.RPC_ForceRelease");
                 for (int i = 0; i < Instances.Count; i++)
                 {
                     var side = Instances[i].SideJoystickGrabHandler;

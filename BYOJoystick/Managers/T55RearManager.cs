@@ -20,7 +20,7 @@ namespace BYOJoystick.Managers
         private static string SideJoystick   => "PassengerOnlyObjs/SideStickObjects (Rear)";
         private static string CenterJoystick => "PassengerOnlyObjs/CenterStickObjects (Rear)";
 
-        private CJoystick Joysticks(string name, string root, bool nullable, int idx)
+        private CJoystick Joysticks(string name, string root, bool nullable, bool checkName, int idx)
         {
             return GetJoysticksByPaths(name, SideJoystick, CenterJoystick);
         }
@@ -155,9 +155,9 @@ namespace BYOJoystick.Managers
             SystemsButton("Chaff On", "Toggle Chaff (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 67);
             SystemsButton("Chaff Off", "Toggle Chaff (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 67);
 
-            SystemsButton("Engine Toggle", "Engine (Rear)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 37);
-            SystemsButton("Engine On", "Engine (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 37);
-            SystemsButton("Engine Off", "Engine (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 37);
+            SystemsButton("Engine Toggle", "Switch Cover (Engine) (Rear)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Cycle, i: 38);
+            SystemsButton("Engine On", "Switch Cover (Engine) (Rear)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 1, i: 38);
+            SystemsButton("Engine Off", "Switch Cover (Engine) (Rear)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 0, i: 38);
 
             SystemsButton("Main Battery Toggle", "Main Battery (Rear)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 41);
             SystemsButton("Main Battery On", "Main Battery (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 41);
@@ -380,11 +380,11 @@ namespace BYOJoystick.Managers
             MiscButton("Fuel Port Open", "Fuel Port (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 58);
             MiscButton("Fuel Port Close", "Fuel Port (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 58);
 
-            MiscButton("Fuel Dump Toggle", "Fuel Dump Switch (Rear)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 59);
-            MiscButton("Fuel Dump On", "Fuel Dump Switch (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 59);
-            MiscButton("Fuel Dump Off", "Fuel Dump Switch (Rear)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 59);
+            MiscButton("Fuel Dump Toggle", "Switch Cover (Fuel Dump) (Rear)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Cycle, i: 60);
+            MiscButton("Fuel Dump On", "Switch Cover (Fuel Dump) (Rear)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 1, i: 60);
+            MiscButton("Fuel Dump Off", "Switch Cover (Fuel Dump) (Rear)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 0, i: 60);
 
-            MiscButton("Jettison Execute", "Jettison (Rear)", ByManifest<VRButton, CButton>, CButton.Use, i: 69);
+            MiscButton("Jettison Execute", "Switch Cover (Jettison) (Rear)", ByManifest<VRLever, CButtonCovered>, CButtonCovered.Use, i: 47);
             MiscButton("Jettison Mark All", "Jettison All (Rear)", ByManifest<VRButton, CButton>, CButton.Use, i: 70);
             MiscButton("Jettison Mark Empty", "Jettison Empty (Rear)", ByManifest<VRButton, CButton>, CButton.Use, i: 71);
             MiscButton("Jettison Mark Ext. Tanks", "Jettison Ext Tanks (Rear)", ByManifest<VRButton, CButton>, CButton.Use, i: 73);

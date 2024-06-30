@@ -6,19 +6,19 @@ namespace BYOJoystick.Controls.Sync
 {
     public class JoystickGrabHandler
     {
-        public bool IsGrabbed { get; private set; }
+        public bool IsGrabbed    { get; private set; }
+        public int  ControlIndex { get; }
 
         private readonly VRInteractable                  _interactable;
         private readonly VRJoystick                      _joystick;
         private readonly ConnectedJoysticks              _jSync;
         private readonly MultiUserVehicleSync            _muvs;
-        private readonly int                             _ctrlIdx;
         private readonly Action<ConnectedJoysticks, int> _onLocalGrabbedStick;
         private readonly Action<ConnectedJoysticks, int> _onLocalReleasedStick;
 
         private JoystickGrabHandler(VRJoystick           joystick,
                                     ConnectedJoysticks   jSync,
-                                    int                  ctrlIdx,
+                                    int                  controlIndex,
                                     MultiUserVehicleSync muvs,
                                     VRInteractable       interactable)
         {
@@ -26,7 +26,7 @@ namespace BYOJoystick.Controls.Sync
             _joystick             = joystick;
             _jSync                = jSync;
             _muvs                 = muvs;
-            _ctrlIdx              = ctrlIdx;
+            ControlIndex          = controlIndex;
             _onLocalGrabbedStick  = CompiledExpressions.CreateEventInvoker<ConnectedJoysticks>("OnLocalGrabbedStick");
             _onLocalReleasedStick = CompiledExpressions.CreateEventInvoker<ConnectedJoysticks>("OnLocalReleasedStick");
         }
@@ -45,9 +45,9 @@ namespace BYOJoystick.Controls.Sync
         public void GrabStick()
         {
             IsGrabbed = true;
-            _jSync.OnGrabbedStick(_ctrlIdx);
+            _jSync.OnGrabbedStick(ControlIndex);
             _muvs.OnControlInteract(_interactable);
-            _onLocalGrabbedStick.Invoke(_jSync, _ctrlIdx);
+            _onLocalGrabbedStick.Invoke(_jSync, ControlIndex);
             _interactable.StartCoroutine(GrabbedEnumerator());
         }
 
@@ -63,9 +63,9 @@ namespace BYOJoystick.Controls.Sync
         public void ReleaseStick()
         {
             IsGrabbed = false;
-            _jSync.OnReleasedStick(_ctrlIdx);
+            _jSync.OnReleasedStick(ControlIndex);
             _muvs.OnControlStopInteract(_interactable);
-            _onLocalReleasedStick.Invoke(_jSync, _ctrlIdx);
+            _onLocalReleasedStick.Invoke(_jSync, ControlIndex);
         }
     }
 }

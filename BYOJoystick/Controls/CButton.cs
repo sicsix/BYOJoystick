@@ -35,7 +35,7 @@ namespace BYOJoystick.Controls
         {
             if (binding.GetAsBool())
             {
-                if (c.Pressed || !c.Interactable.enabled)
+                if (c.Pressed || !c.Interactable.enabled || !c.Interactable.gameObject.activeInHierarchy)
                     return;
 
                 if (c.IsMP)

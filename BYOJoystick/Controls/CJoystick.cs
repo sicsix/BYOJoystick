@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using BYOJoystick.Bindings;
 using BYOJoystick.Controls.Converters;
 using BYOJoystick.Controls.Sync;
+using Harmony;
 using UnityEngine;
 using VTOLVR.Multiplayer;
 
@@ -9,6 +11,8 @@ namespace BYOJoystick.Controls
 {
     public class CJoystick : IControl
     {
+        public static List<CJoystick> Instances = new List<CJoystick>();
+
         protected readonly bool IsMP;
         protected readonly bool IsMulticrew;
 
@@ -30,6 +34,8 @@ namespace BYOJoystick.Controls
         protected          bool                   ThumbstickPressed;
         protected          bool                   MenuButtonPressed;
         protected readonly Func<VRJoystick, bool> GetRemoteOnly;
+        protected          float                  ReleaseTimer;
+        private const      float                  ReleaseTime = 1.5f;
 
 
         protected readonly DigitalToAxisSmoothed ThumbstickXSmoothed = new DigitalToAxisSmoothed(0.25f, 1f, 1f);
@@ -37,6 +43,7 @@ namespace BYOJoystick.Controls
 
         public CJoystick(VRJoystick sideJoystick, VRJoystick centerJoystick, bool isMulticrew)
         {
+            Instances.Add(this);
             IsMP                                  = VTOLMPUtils.IsMultiplayer();
             IsMulticrew                           = isMulticrew;
             SideJoystick                          = sideJoystick;
@@ -64,35 +71,81 @@ namespace BYOJoystick.Controls
             CenterJoystickGrabHandler = JoystickGrabHandler.Create(centerJoystick, connectedJoysticks, muvs, centerJoystickInteractable);
         }
 
+        [HarmonyPatch(typeof(ConnectedJoystickSync), nameof(ConnectedJoystickSync.RPC_ForceRelease))]
+        class Patch
+        {
+            static void Prefix(int excludeIdx)
+            {
+                Plugin.Log("Executing prefix patch for ConnectedJoystickSync.RPC_ForceRelease");
+                for (int i = 0; i < Instances.Count; i++)
+                {
+                    var side = Instances[i].SideJoystickGrabHandler;
+                    if (side != null)
+                    {
+                        if (side.ControlIndex != excludeIdx && side.IsGrabbed)
+                            side.ReleaseStick();
+                    }
+
+                    var center = Instances[i].CenterJoystickGrabHandler;
+                    if (center != null)
+                    {
+                        if (center.ControlIndex != excludeIdx && center.IsGrabbed)
+                            center.ReleaseStick();
+                    }
+                }
+            }
+        }
+
 
         public void PostUpdate()
         {
             bool isSideJoystickActive = SideJoystick.gameObject.activeInHierarchy;
             var  joystick             = isSideJoystickActive || !HasCenterJoystick ? SideJoystick : CenterJoystick;
 
-            if (JoystickVector != PreviousJoystickVector)
+            if (!IsMP || !IsMulticrew)
             {
-                PreviousJoystickVector = JoystickVector;
-
-                if (!IsMP || !IsMulticrew)
+                if (JoystickVector != PreviousJoystickVector)
                 {
+                    PreviousJoystickVector = JoystickVector;
                     joystick.RemoteSetStick(JoystickVector);
                     joystick.OnSetStick?.Invoke(JoystickVector);
                     joystick.OnSetSteer?.Invoke(JoystickVector.y);
                 }
+            }
+            else
+            {
+                var syncWrapper = isSideJoystickActive ? SideJoystickSyncWrapper : CenterJoystickSyncWrapper;
+                var grabHandler = isSideJoystickActive ? SideJoystickGrabHandler : CenterJoystickGrabHandler;
+
+                float magnitude = Mathf.Max(new Vector2(JoystickVector.x, JoystickVector.z).magnitude, Mathf.Abs(JoystickVector.y));
+
+                if (grabHandler.IsGrabbed)
+                {
+                    if (magnitude > 0.03f)
+                        ReleaseTimer = 0f;
+                    else
+                    {
+                        ReleaseTimer += Time.deltaTime;
+                        if (ReleaseTimer > ReleaseTime)
+                            grabHandler.ReleaseStick();
+                    }
+                }
                 else
                 {
-                    var syncWrapper = isSideJoystickActive ? SideJoystickSyncWrapper : CenterJoystickSyncWrapper;
-                    var grabHandler = isSideJoystickActive ? SideJoystickGrabHandler : CenterJoystickGrabHandler;
-
-                    float magnitude = Mathf.Max(new Vector2(JoystickVector.x, JoystickVector.z).magnitude, Mathf.Abs(JoystickVector.y));
-
-                    if (!grabHandler.IsGrabbed && magnitude > 0.20f)
+                    if (magnitude > 0.15f)
+                    {
                         grabHandler.GrabStick();
-                    else if (grabHandler.IsGrabbed && magnitude < 0.03f)
-                        grabHandler.ReleaseStick();
+                        ReleaseTimer = 0f;
+                    }
+                }
 
-                    if ((syncWrapper == null || syncWrapper.TryInteractTimed(true, 0.5f)) && !GetRemoteOnly(joystick))
+                if (JoystickVector != PreviousJoystickVector)
+                {
+                    PreviousJoystickVector = JoystickVector;
+
+                    syncWrapper?.TryInteractTimed(true, 0.5f);
+
+                    if (grabHandler.IsGrabbed && !GetRemoteOnly(joystick))
                     {
                         joystick.RemoteSetStick(JoystickVector);
                         if (joystick.sendEvents)

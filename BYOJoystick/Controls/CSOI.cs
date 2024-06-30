@@ -152,9 +152,9 @@ namespace BYOJoystick.Controls
         private void DoRadarZoom(bool zoomIn)
         {
             if (zoomIn)
-                RadarPage.RangeUp();
-            else
                 RadarPage.RangeDown();
+            else
+                RadarPage.RangeUp();
         }
 
         private void DoTSDZoom(bool zoomIn)

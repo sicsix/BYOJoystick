@@ -13,6 +13,8 @@ namespace BYOJoystick.Controls
         protected readonly bool                    IsMP;
         protected readonly VRLever                 Lever;
 
+        public int CurrentState => Lever.currentState;
+
         public CLever(VRInteractable interactable, VRLever lever)
         {
             Interactable = interactable;
@@ -25,7 +27,7 @@ namespace BYOJoystick.Controls
         {
         }
 
-        private void SetLeverValue(int value)
+        public void SetLeverValue(int value)
         {
             if (IsMP && SyncWrapper != null)
             {

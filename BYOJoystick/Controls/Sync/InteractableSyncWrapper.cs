@@ -28,8 +28,14 @@ namespace BYOJoystick.Controls.Sync
 
         public bool TryInteractTimed(bool isRightCon, float time)
         {
+            ulong exclusiveUser = _iSync.GetCurrentExclusiveUser();
             if (IsInteracting)
             {
+                if (_iSync.exclusive && exclusiveUser != 0L && exclusiveUser != BDSteamClient.mySteamID)
+                {
+                    IsInteracting = false;
+                    return false;
+                }
                 SetTimer(time);
                 return true;
             }

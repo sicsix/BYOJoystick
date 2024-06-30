@@ -1,5 +1,6 @@
 using System.Collections;
 using System.IO;
+using Harmony;
 using UnityEngine;
 
 namespace BYOJoystick
@@ -21,6 +22,10 @@ namespace BYOJoystick
             _instance = this;
             Log("Loading BYO Joystick Plugin");
             base.ModLoaded();
+            
+            Log("Creating Harmony Patches");
+            HarmonyInstance.Create("com.BYOJoystick").PatchAll();
+            
             StartCoroutine(LoadAssetBundle());
         }
 

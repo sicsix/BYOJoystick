@@ -21,6 +21,8 @@ namespace BYOJoystick.Managers.Base
             if (VehicleControlManifest == null)
                 throw new InvalidOperationException("VehicleControlManifest not found.");
 
+            CJoystick.Instances.Clear();
+
             Interactables = Vehicle.GetComponentsInChildren<VRInteractable>(true);
             Plugin.Log($"Found {Interactables.Length} interactables.");
 

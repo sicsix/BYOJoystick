@@ -9,12 +9,12 @@ namespace BYOJoystick.Managers
         public override string GameName    => "F-45A";
         public override string ShortName   => "F45A";
         public override bool   IsMulticrew => false;
-        
+
         private static string SideJoystick   => "Local/JoystickObjects/SideStickObjects";
         private static string CenterJoystick => "Local/JoystickObjects/CenterStickObjects";
         private static string TSD            => "Local/DashCanvas/Dash/touchScreenArea/MFDPortals/poweredObj/TacticalSituationDisplay";
-        
-        private CJoystick Joysticks(string name, string root, bool nullable, int idx)
+
+        private CJoystick Joysticks(string name, string root, bool nullable, bool checkName, int idx)
         {
             return GetJoysticksByPaths(name, SideJoystick, CenterJoystick);
         }
@@ -90,9 +90,9 @@ namespace BYOJoystick.Managers
         {
             SystemsButton("Clear Cautions", "Dismiss", ByManifest<VRButton, CButton>, CButton.Use, i: 11);
 
-            SystemsButton("Master Arm Toggle", "Master Arm Switch", ByManifest<VRLever, CLever>, CLever.Cycle, i: 0);
-            SystemsButton("Master Arm On", "Master Arm Switch", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 0);
-            SystemsButton("Master Arm Off", "Master Arm Switch", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 0);
+            SystemsButton("Master Arm Toggle", "Switch Cover (Master Arm)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Cycle, c: false, i: 1);
+            SystemsButton("Master Arm On", "Switch Cover (Master Arm)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 1, c: false, i: 1);
+            SystemsButton("Master Arm Off", "Switch Cover (Master Arm)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 0, c: false, i: 1);
 
             SystemsButton("Fire Weapon", "Joystick", Joysticks, CJoystick.Trigger, i: 0);
             SystemsButton("Cycle Weapons", "Joystick", Joysticks, CJoystick.MenuButton, i: 0);
@@ -106,9 +106,9 @@ namespace BYOJoystick.Managers
             SystemsButton("Chaff On", "CMSConfigUI", ByType<CMSConfigUI, CCMS>, CCMS.ChaffOn);
             SystemsButton("Chaff Off", "CMSConfigUI", ByType<CMSConfigUI, CCMS>, CCMS.ChaffOff);
 
-            SystemsButton("Engine Toggle", "Engine", ByManifest<VRLever, CLever>, CLever.Cycle, i: 13);
-            SystemsButton("Engine On", "Engine", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 13);
-            SystemsButton("Engine Off", "Engine", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 13);
+            SystemsButton("Engine Toggle", "Switch Cover (Engine)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Cycle, c: false, i: 14);
+            SystemsButton("Engine On", "Switch Cover (Engine)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 1, c: false, i: 14);
+            SystemsButton("Engine Off", "Switch Cover (Engine)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 0, c: false, i: 14);
 
             SystemsButton("Main Battery Toggle", "Main Battery", ByManifest<VRLever, CLever>, CLever.Cycle, i: 15);
             SystemsButton("Main Battery On", "Main Battery", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 15);

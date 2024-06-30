@@ -19,7 +19,7 @@ namespace BYOJoystick.Managers
         private static string CenterJoystick => "PassengerOnlyObjs/FrontCockpit/CenterStickObjects (Front)";
         private static string TSD            => "PassengerOnlyObjs/FrontCockpit/DashTransform/touchScreenArea/MFDPortals/poweredObj/-- pages --/TacticalSituationDisplay";
 
-        private CJoystick Joysticks(string name, string root, bool nullable, int idx)
+        private CJoystick Joysticks(string name, string root, bool nullable, bool checkName, int idx)
         {
             return GetJoysticksByPaths(name, SideJoystick, CenterJoystick);
         }
@@ -144,12 +144,12 @@ namespace BYOJoystick.Managers
             SystemsButton("Tx Power Increase", "EF24Hotas", EF24Hotas, CEF24Hotas.IncreaseTxPower);
             SystemsButton("Tx Power Decrease", "EF24Hotas", EF24Hotas, CEF24Hotas.DecreaseTxPower);
 
-            SystemsButton("Engine Left Toggle", "Engine L (Front)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 13);
-            SystemsButton("Engine Left On", "Engine L (Front)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 13);
-            SystemsButton("Engine Left Off", "Engine L (Front)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 13);
-            SystemsButton("Engine Right Toggle", "Engine R (Front)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 15);
-            SystemsButton("Engine Right On", "Engine R (Front)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 15);
-            SystemsButton("Engine Right Off", "Engine R (Front)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 15);
+            SystemsButton("Engine Left Toggle", "Switch Cover (Engine L) (Front)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Cycle, i: 14);
+            SystemsButton("Engine Left On", "Switch Cover (Engine L) (Front)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 1, i: 14);
+            SystemsButton("Engine Left Off", "Switch Cover (Engine L) (Front)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 0, i: 14);
+            SystemsButton("Engine Right Toggle", "Switch Cover (Engine R) (Front)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Cycle, i: 16);
+            SystemsButton("Engine Right On", "Switch Cover (Engine R) (Front)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 1, i: 16);
+            SystemsButton("Engine Right Off", "Switch Cover (Engine R) (Front)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 0, i: 16);
 
             SystemsButton("Main Battery Toggle", "Main Battery", ByManifest<VRLever, CLever>, CLever.Cycle, i: 8);
             SystemsButton("Main Battery On", "Main Battery", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 8);
@@ -212,7 +212,7 @@ namespace BYOJoystick.Managers
 
             DisplayButton("SOI Zoom In", "SOI", SOI, CSOI.ZoomIn);
             DisplayButton("SOI Zoom Out", "SOI", SOI, CSOI.ZoomOut);
-            
+
             DisplayButton("TSD Slew TGP/EOTS", "Slew TGP", TSDInteractable, CInteractable.Use, r: TSD);
             DisplayButton("TSD GPS-S", "GPS Send", TSDInteractable, CInteractable.Use, r: TSD);
 
@@ -338,19 +338,19 @@ namespace BYOJoystick.Managers
             MiscButton("Jettison Mark Sel", "Jettison Switch", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 2, i: 4);
         }
 
-        private CEF24Hotas EF24Hotas(string name, string root, bool nullable, int idx)
+        private CEF24Hotas EF24Hotas(string name, string root, bool nullable, bool checkName, int idx)
         {
             if (TryGetExistingControl<CEF24Hotas>(name, out var existingControl))
                 return existingControl;
             var ef24Hotas         = FindComponent<EF24Hotas>(Vehicle);
-            var setArmingAAButton = ByName<VRButton, CButton>("AA Mode", Cockpit, false, -1);
-            var setArmingAGButton = ByName<VRButton, CButton>("AG Mode", Cockpit, false, -1);
+            var setArmingAAButton = ByName<VRButton, CButton>("AA Mode", Cockpit, false, true, -1);
+            var setArmingAGButton = ByName<VRButton, CButton>("AG Mode", Cockpit, false, true, -1);
             var cEF24Hotas        = new CEF24Hotas(ef24Hotas, setArmingAAButton, setArmingAGButton);
             Controls.Add(name, cEF24Hotas);
             return cEF24Hotas;
         }
-        
-        private CInteractable TSDInteractable(string name, string root, bool nullable, int idx)
+
+        private CInteractable TSDInteractable(string name, string root, bool nullable, bool checkName, int idx)
         {
             if (TryGetExistingControl<CInteractable>(name, out var existingControl))
                 return existingControl;

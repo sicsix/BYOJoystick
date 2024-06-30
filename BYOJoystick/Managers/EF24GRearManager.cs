@@ -17,7 +17,7 @@ namespace BYOJoystick.Managers
         private static string Seat          => "RearSeatParent";
         private static string RightJoystick => "PassengerOnlyObjs/RearCockpit/ewoStickTilt/joyInteractable_rearRight";
 
-        private CJoystick RightStick(string name, string root, bool nullable, int idx)
+        private CJoystick RightStick(string name, string root, bool nullable, bool checkName, int idx)
         {
             return GetJoysticksByPaths(name, RightJoystick, null);
         }
@@ -242,19 +242,19 @@ namespace BYOJoystick.Managers
             MiscButton("Jettison Mark Sel", "Jettison Switch", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 2, i: 11);
         }
 
-        private CEF24Hotas EF24Hotas(string name, string root, bool nullable, int idx)
+        private CEF24Hotas EF24Hotas(string name, string root, bool nullable, bool checkName, int idx)
         {
             if (TryGetExistingControl<CEF24Hotas>(name, out var existingControl))
                 return existingControl;
             var ef24Hotas         = FindComponent<EF24Hotas>(Vehicle);
-            var setArmingAAButton = ByName<VRButton, CButton>("AA Mode", Cockpit, false, -1);
-            var setArmingAGButton = ByName<VRButton, CButton>("AG Mode", Cockpit, false, -1);
+            var setArmingAAButton = ByName<VRButton, CButton>("AA Mode", Cockpit, false, true, -1);
+            var setArmingAGButton = ByName<VRButton, CButton>("AG Mode", Cockpit, false, true, -1);
             var cEF24Hotas        = new CEF24Hotas(ef24Hotas, setArmingAAButton, setArmingAGButton);
             Controls.Add(name, cEF24Hotas);
             return cEF24Hotas;
         }
 
-        private CInteractable TSDInteractable(string name, string root, bool nullable, int idx)
+        private CInteractable TSDInteractable(string name, string root, bool nullable, bool checkName, int idx)
         {
             if (TryGetExistingControl<CInteractable>(name, out var existingControl))
                 return existingControl;

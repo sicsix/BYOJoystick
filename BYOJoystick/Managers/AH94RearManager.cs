@@ -21,7 +21,7 @@ namespace BYOJoystick.Managers
         private static string CenterJoystick => "PassengerOnlyObjects/localCockpit/controls.001/centerJoystickBase_rear";
         private static string EjectHandle    => "PassengerOnlyObjects/bailBase_rear";
 
-        private CJoystick Joysticks(string name, string root, bool nullable, int idx)
+        private CJoystick Joysticks(string name, string root, bool nullable, bool checkName, int idx)
         {
             return GetJoysticksByPaths(name, SideJoystick, CenterJoystick);
         }
@@ -347,7 +347,7 @@ namespace BYOJoystick.Managers
             MiscButton("Jettison R TIP", "Mark Jett R TIP (Rear)", ByManifest<VRButton, CButton>, CButton.Use, i: 87);
         }
 
-        private CUFD UFD(string name, string root, bool nullable, int idx)
+        private CUFD UFD(string name, string root, bool nullable, bool checkName, int idx)
         {
             if (TryGetExistingControl<CUFD>(name, out var existingControl))
                 return existingControl;
@@ -359,19 +359,19 @@ namespace BYOJoystick.Managers
             if (powerUnit == null)
                 throw new InvalidOperationException("Could not find UFD power unit");
 
-            var powerButton = ByManifest<VRButton, CButton>("UFD Power (Rear)", null, false, 91);
+            var powerButton = ByManifest<VRButton, CButton>("UFD Power (Rear)", null, false, true, 91);
             if (powerButton == null)
                 throw new InvalidOperationException("Could not find UFD power button");
 
-            var fuelPageButton = ByManifest<VRButton, CButton>("UFD Fuel (Rear)", null, false, 89);
+            var fuelPageButton = ByManifest<VRButton, CButton>("UFD Fuel (Rear)", null, false, true, 89);
             if (fuelPageButton == null)
                 throw new InvalidOperationException("Could not find UFD fuel page button");
 
-            var apPageButton = ByManifest<VRButton, CButton>("UFD Autopilot (Rear)", null, false, 90);
+            var apPageButton = ByManifest<VRButton, CButton>("UFD Autopilot (Rear)", null, false, true, 90);
             if (apPageButton == null)
                 throw new InvalidOperationException("Could not find UFD autopilot page button");
 
-            var statusPageButton = ByManifest<VRButton, CButton>("UFD Status (Rear)", null, false, 92);
+            var statusPageButton = ByManifest<VRButton, CButton>("UFD Status (Rear)", null, false, true, 92);
             if (statusPageButton == null)
                 throw new InvalidOperationException("Could not find UFD status page button");
 

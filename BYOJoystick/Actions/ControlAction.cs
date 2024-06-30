@@ -10,26 +10,28 @@ namespace BYOJoystick.Actions
         public ActionCategory Category { get; }
         public ActionInput    Input    { get; }
 
-        private readonly string                                    _controlName;
-        private          IControl                                  _control;
-        private readonly Func<string, string, bool, int, IControl> _mapper;
-        private readonly Action<IControl, Binding, int>            _action;
-        private readonly int                                       _state;
-        private readonly string                                    _root;
-        private readonly bool                                      _nullable;
-        private readonly int                                       _idx;
+        private readonly string                                          _controlName;
+        private          IControl                                        _control;
+        private readonly Func<string, string, bool, bool, int, IControl> _mapper;
+        private readonly Action<IControl, Binding, int>                  _action;
+        private readonly int                                             _state;
+        private readonly string                                          _root;
+        private readonly bool                                            _nullable;
+        private readonly bool                                            _checkName;
+        private readonly int                                             _idx;
 
 
-        public ControlAction(string                                    name,
-                             ActionCategory                            category,
-                             ActionInput                               input,
-                             string                                    controlName,
-                             Func<string, string, bool, int, IControl> mapper,
-                             Action<IControl, Binding, int>            action,
-                             int                                       state,
-                             string                                    root,
-                             bool                                      nullable,
-                             int                                       idx)
+        public ControlAction(string                                          name,
+                             ActionCategory                                  category,
+                             ActionInput                                     input,
+                             string                                          controlName,
+                             Func<string, string, bool, bool, int, IControl> mapper,
+                             Action<IControl, Binding, int>                  action,
+                             int                                             state,
+                             string                                          root,
+                             bool                                            nullable,
+                             bool                                            checkName,
+                             int                                             idx)
         {
             Name         = name;
             Category     = category;
@@ -40,6 +42,7 @@ namespace BYOJoystick.Actions
             _state       = state;
             _root        = root;
             _nullable    = nullable;
+            _checkName   = checkName;
             _idx         = idx;
         }
 
@@ -58,7 +61,7 @@ namespace BYOJoystick.Actions
         public void Map()
         {
             if (_mapper != null)
-                _control = _mapper(_controlName, _root, _nullable, _idx);
+                _control = _mapper(_controlName, _root, _nullable, _checkName, _idx);
         }
 
         public void Clear()

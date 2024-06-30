@@ -2,7 +2,6 @@
 using BYOJoystick.Bindings;
 using BYOJoystick.Controls;
 using UnityEngine;
-using VTOLVR.DLC.EW;
 using VTOLVR.DLC.Rotorcraft;
 using VTOLVR.Multiplayer;
 
@@ -49,11 +48,11 @@ namespace BYOJoystick.Managers.Base
             Plugin.Log($"Controls mapped for {GameName}.");
         }
 
-        protected U ByName<T, U>(string name, string root, bool nullable, int idx) where T : MonoBehaviour where U : class, IControl
+        protected U ByName<T, U>(string name, string root, bool nullable, bool checkName, int idx) where T : MonoBehaviour where U : class, IControl
         {
             if (TryGetExistingControl<U>(name, out var existingControl))
                 return existingControl;
-            var rootObject =  root == null ? Vehicle : GetGameObject(root, nullable);
+            var rootObject = root == null ? Vehicle : GetGameObject(root, nullable);
             if (rootObject == null)
                 return null;
             var interactables = rootObject == Vehicle ? Interactables : rootObject.GetComponentsInChildren<VRInteractable>(true);
@@ -64,21 +63,21 @@ namespace BYOJoystick.Managers.Base
             return ToControl<T, U>(name, interactable, component);
         }
 
-        protected U ByType<T, U>(string name, string root, bool nullable, int idx) where T : MonoBehaviour where U : class, IControl
+        protected U ByType<T, U>(string name, string root, bool nullable, bool checkName, int idx) where T : MonoBehaviour where U : class, IControl
         {
             if (TryGetExistingControl<U>(name, out var existingControl))
                 return existingControl;
-            var rootObject =  root == null ? Vehicle : GetGameObject(root, nullable);
+            var rootObject = root == null ? Vehicle : GetGameObject(root, nullable);
             if (rootObject == null)
                 return null;
-            var component  = FindComponent<T>(rootObject, nullable);
+            var component = FindComponent<T>(rootObject, nullable);
             if (component == null)
                 return null;
             var interactable = component.GetComponent<VRInteractable>();
             return ToControl<T, U>(name, interactable, component);
         }
 
-        private VRThrottle GetManifestThrottle(string name, int idx)
+        private VRThrottle GetManifestThrottle(string name, int idx, bool checkName)
         {
             if (idx < 0)
                 return VehicleControlManifest.throttle;
@@ -88,7 +87,7 @@ namespace BYOJoystick.Managers.Base
                 var powerLever = VehicleControlManifest.powerLevers[idx];
                 if (powerLever != null)
                 {
-                    if (GetInteractable(powerLever).GetControlReferenceName() == name)
+                    if (!checkName || GetInteractable(powerLever).GetControlReferenceName() == name)
                         return powerLever;
                 }
             }
@@ -98,7 +97,7 @@ namespace BYOJoystick.Managers.Base
                 var collective = VehicleControlManifest.collectives[idx];
                 if (collective != null)
                 {
-                    if (GetInteractable(collective).GetControlReferenceName() == name)
+                    if (!checkName || GetInteractable(collective).GetControlReferenceName() == name)
                         return collective;
                 }
             }
@@ -122,7 +121,7 @@ namespace BYOJoystick.Managers.Base
             return component;
         }
 
-        protected U ByManifest<T, U>(string name, string root, bool nullable, int idx) where T : MonoBehaviour where U : class, IControl
+        protected U ByManifest<T, U>(string name, string root, bool nullable, bool checkName, int idx) where T : MonoBehaviour where U : class, IControl
         {
             if (TryGetExistingControl<U>(name, out var existingControl))
                 return existingControl;
@@ -139,7 +138,7 @@ namespace BYOJoystick.Managers.Base
             else if (typeof(T) == typeof(VRDoor))
                 component = GetManifestControl(name, idx, nullable, VehicleControlManifest.doors) as T;
             else if (typeof(T) == typeof(VRThrottle))
-                component = GetManifestThrottle(name, idx) as T;
+                component = GetManifestThrottle(name, idx, checkName) as T;
             else if (typeof(T) == typeof(VRJoystick))
                 component = GetManifestControl(name, idx, nullable, VehicleControlManifest.joysticks) as T;
             else
@@ -154,7 +153,7 @@ namespace BYOJoystick.Managers.Base
 
             var interactable = GetInteractable(component);
 
-            if (interactable.GetControlReferenceName() != name)
+            if (checkName && interactable.GetControlReferenceName() != name)
                 throw new InvalidOperationException($"Interactable {interactable.GetControlReferenceName()} does not match {name}.");
 
             return ToControl<T, U>(name, interactable, component);
@@ -183,6 +182,7 @@ namespace BYOJoystick.Managers.Base
                     return null;
                 throw new InvalidOperationException($"GameObject {name} not found");
             }
+
             return transform.gameObject;
         }
 
@@ -230,31 +230,81 @@ namespace BYOJoystick.Managers.Base
 
         private U ToControl<T, U>(string name, VRInteractable interactable, T component) where T : MonoBehaviour where U : class, IControl
         {
-            var control = component switch
+            IControl control;
+            switch (component)
             {
-                VRInteractable vrInteractable      => new CInteractable(vrInteractable),
-                VRLever lever                      => new CLever(interactable, lever),
-                VRTwistKnob twistKnob              => new CKnob(interactable, twistKnob),
-                VRTwistKnobInt twistKnobInt        => new CKnobInt(interactable, twistKnobInt),
-                VRButton button                    => new CButton(interactable, button),
-                VRThrottle throttle                => new CThrottle(interactable, throttle, IsMulticrew),
-                VRDoor door                        => new CDoor(interactable, door),
-                MFDPortalPresetButton presetButton => new CPresetButton(presetButton, MFDPortalManagers.Length > 0 ? MFDPortalManagers[0] : null),
-                APKnobAltAdjust altKnob            => new CAltAdjust(altKnob),
-                APKnobSpeedDialAdjust speedKnob    => new CSpdAdjust(speedKnob),
-                DashHSI dashHsi                    => new CHSI(dashHsi),
-                HelmetController helmet            => new CHelmet(helmet),
-                MFD mfd                            => typeof(U) == typeof(CMFD) ? (IControl)new CMFD(mfd) : new CMMFD(mfd),
-                CockpitTeamRadioManager radio      => new CRadio(radio),
-                EjectHandle ejectHandle            => new CEject(ejectHandle),
-                AH94CollectiveFunctions collective => new CCollFuncs(collective),
-                VehicleMaster vehicleMaster        => new CVehicleMaster(vehicleMaster, MFDPortalManagers.Length > 0 ? MFDPortalManagers[0] : null),
-                CMSConfigUI cmsConfig              => new CCMS(cmsConfig, MFDPortalManagers.Length               > 0 ? MFDPortalManagers[0] : null),
-                DashRWR dashRWR                    => new CDashRWR(dashRWR, MFDPortalManagers.Length             > 0 ? MFDPortalManagers[0] : null),
-                MFDRadarUI radarUI                 => new CRadarPower(radarUI, MFDPortalManagers.Length          > 0 ? MFDPortalManagers[0] : null),
-                AeroGeometryLever aeroLever        => new CSweep(aeroLever),
-                _                                  => throw new InvalidOperationException($"Control {typeof(T).Name} not supported")
-            };
+                case VRInteractable vrInteractable:
+                    control = new CInteractable(vrInteractable);
+                    break;
+                case VRLever lever:
+                    var switchCover = interactable.GetComponent<VRSwitchCover>();
+                    if (switchCover == null)
+                        control = new CLever(interactable, lever);
+                    else if (switchCover.coveredSwitch.GetComponent<VRButton>() != null)
+                        control = new CButtonCovered(interactable, switchCover);
+                    else
+                        control = new CLeverCovered(interactable, switchCover);
+                    break;
+                case VRTwistKnob twistKnob:
+                    control = new CKnob(interactable, twistKnob);
+                    break;
+                case VRTwistKnobInt twistKnobInt:
+                    control = new CKnobInt(interactable, twistKnobInt);
+                    break;
+                case VRButton button:
+                    control = new CButton(interactable, button);
+                    break;
+                case VRThrottle throttle:
+                    control = new CThrottle(interactable, throttle, IsMulticrew);
+                    break;
+                case VRDoor door:
+                    control = new CDoor(interactable, door);
+                    break;
+                case MFDPortalPresetButton presetButton:
+                    control = new CPresetButton(presetButton, MFDPortalManagers.Length > 0 ? MFDPortalManagers[0] : null);
+                    break;
+                case APKnobAltAdjust altKnob:
+                    control = new CAltAdjust(altKnob);
+                    break;
+                case APKnobSpeedDialAdjust speedKnob:
+                    control = new CSpdAdjust(speedKnob);
+                    break;
+                case DashHSI dashHsi:
+                    control = new CHSI(dashHsi);
+                    break;
+                case HelmetController helmet:
+                    control = new CHelmet(helmet);
+                    break;
+                case MFD mfd:
+                    control = typeof(U) == typeof(CMFD) ? (IControl)new CMFD(mfd) : new CMMFD(mfd);
+                    break;
+                case CockpitTeamRadioManager radio:
+                    control = new CRadio(radio);
+                    break;
+                case EjectHandle ejectHandle:
+                    control = new CEject(ejectHandle);
+                    break;
+                case AH94CollectiveFunctions collective:
+                    control = new CCollFuncs(collective);
+                    break;
+                case VehicleMaster vehicleMaster:
+                    control = new CVehicleMaster(vehicleMaster, MFDPortalManagers.Length > 0 ? MFDPortalManagers[0] : null);
+                    break;
+                case CMSConfigUI cmsConfig:
+                    control = new CCMS(cmsConfig, MFDPortalManagers.Length > 0 ? MFDPortalManagers[0] : null);
+                    break;
+                case DashRWR dashRWR:
+                    control = new CDashRWR(dashRWR, MFDPortalManagers.Length > 0 ? MFDPortalManagers[0] : null);
+                    break;
+                case MFDRadarUI radarUI:
+                    control = new CRadarPower(radarUI, MFDPortalManagers.Length > 0 ? MFDPortalManagers[0] : null);
+                    break;
+                case AeroGeometryLever aeroLever:
+                    control = new CSweep(aeroLever);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Control {typeof(T).Name} not supported");
+            }
 
             Controls.Add(name, control);
 
@@ -274,7 +324,7 @@ namespace BYOJoystick.Managers.Base
             return mfd;
         }
 
-        protected CMFD MFD(string name, string root, bool nullable, int idx)
+        protected CMFD MFD(string name, string root, bool nullable, bool checkName, int idx)
         {
             if (TryGetExistingControl<CMFD>(name, out var existingControl))
                 return existingControl;
@@ -307,7 +357,7 @@ namespace BYOJoystick.Managers.Base
             return mmfd;
         }
 
-        protected CMMFD MMFD(string name, string root, bool nullable, int idx)
+        protected CMMFD MMFD(string name, string root, bool nullable, bool checkName, int idx)
         {
             if (TryGetExistingControl<CMMFD>(name, out var existingControl))
                 return existingControl;
@@ -328,7 +378,7 @@ namespace BYOJoystick.Managers.Base
             return control;
         }
 
-        protected CSOI SOI(string name, string root, bool nullable, int idx)
+        protected CSOI SOI(string name, string root, bool nullable, bool checkName, int idx)
         {
             if (TryGetExistingControl<CSOI>(name, out var existingControl))
                 return existingControl;
@@ -360,7 +410,7 @@ namespace BYOJoystick.Managers.Base
             return control;
         }
 
-        protected CThrottleTilt ThrottleTilt(string name, string root, bool nullable, int idx)
+        protected CThrottleTilt ThrottleTilt(string name, string root, bool nullable, bool checkName, int idx)
         {
             if (TryGetExistingControl<CThrottleTilt>(name, out var existingControl))
                 return existingControl;

@@ -17,9 +17,10 @@ namespace BYOJoystick.Controls
         protected readonly VRThrottle              Throttle;
         protected readonly InteractableSyncWrapper SyncWrapper;
         protected readonly ThrottleGrabHandler     GrabHandler;
-
+        
         protected          float                  ThrottleValue;
         protected          float                  PreviousThrottleValue;
+        protected          float                  AboveGateThrottleValue;
         protected          Vector3                ThumbstickVector;
         protected          Vector3                DigitalThumbstickVector;
         protected          bool                   ThumbstickWasZero;
@@ -50,9 +51,9 @@ namespace BYOJoystick.Controls
         public virtual void PostUpdate()
         {
             if (ThrottleSmoothed.Calculate())
-                SetThrottleValue(Throttle.currentThrottle + ThrottleSmoothed.Delta);
+                SetThrottleValue(Throttle.currentThrottle + ThrottleSmoothed.Delta, true);
             else if (ThrottleValue != PreviousThrottleValue)
-                SetThrottleValue(ThrottleValue);
+                SetThrottleValue(ThrottleValue, false);
 
             if (DigitalThumbstickVector != Vector3.zero)
             {
@@ -74,29 +75,25 @@ namespace BYOJoystick.Controls
             DigitalThumbstickVector = Vector3.zero;
         }
 
-        protected void SetThrottleValue(float value)
+        protected void SetThrottleValue(float value, bool isButtonInput)
         {
             if (!IsMP || !IsMulticrew)
             {
-                Throttle.RemoteSetThrottleForceEvents(Mathf.Clamp01(value));
                 PreviousThrottleValue = ThrottleValue;
-                ThrottleValue         = value;
+                Throttle.RemoteSetThrottleForceEvents(ThrottleValue);
             }
             else
             {
                 float delta = Mathf.Abs(value - PreviousThrottleValue);
-                if (delta < 0.01f)
-                    return;
+                if (isButtonInput || (delta > 0.01f && !GrabHandler.IsGrabbed) || GrabHandler.IsGrabbed)
+                    GrabHandler.GrabThrottle(1.5f);
+                
+                PreviousThrottleValue = ThrottleValue;
 
-                if ((delta > 0.075f && !GrabHandler.IsGrabbed) || (delta > 0.01f && GrabHandler.IsGrabbed))
-                    GrabHandler.GrabThrottle(0.5f);
+                SyncWrapper?.TryInteractTimed(true, 0.5f);
 
-                if ((SyncWrapper == null || SyncWrapper.TryInteractTimed(false, 0.5f)) && !GetRemoteOnly(Throttle))
-                {
-                    PreviousThrottleValue = ThrottleValue;
-                    Throttle.RemoteSetThrottle(Mathf.Clamp01(value));
-                    ThrottleValue = value;
-                }
+                if (GrabHandler.IsGrabbed && !GetRemoteOnly(Throttle))
+                    Throttle.RemoteSetThrottle(ThrottleValue);
             }
         }
 

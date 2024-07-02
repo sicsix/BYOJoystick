@@ -141,8 +141,6 @@ namespace BYOJoystick.Controls
                      || (grabHandler.IsGrabbed
                       && (pMag > Mathf.Max(0.005f, PitchDeadzone / 2f) || yMag > Mathf.Max(0.005f, YawDeadzone / 2f) || rMag > Mathf.Max(0.005f, RollDeadzone / 2f))))
                     {
-                        Plugin.Log($"Grabbing stick X: {JoystickVector.x}, Y: {JoystickVector.y}, Z: {JoystickVector.z}");
-                        Plugin.Log($"Deadzones: Pitch: {PitchDeadzone}, Yaw: {YawDeadzone}, Roll: {RollDeadzone}");
                         grabHandler.GrabStick(1.5f);
                     }
 

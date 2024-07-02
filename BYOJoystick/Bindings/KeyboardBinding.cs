@@ -31,16 +31,6 @@ namespace BYOJoystick.Bindings
             Action.Invoke(this);
         }
 
-        public override float GetAsFloat()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override float GetAsFloatCentered()
-        {
-            throw new NotImplementedException();
-        }
-
         public override bool GetAsBool()
         {
             return _active;

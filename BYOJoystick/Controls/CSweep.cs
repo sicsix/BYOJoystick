@@ -36,7 +36,7 @@ namespace BYOJoystick.Controls
 
         public static void Set(CSweep c, Binding binding, int state)
         {
-            c.LeverValue = binding.GetAsFloat();
+            c.LeverValue = ((JoystickBinding)binding).GetAsFloat();
         }
 
         public static void Forward(CSweep c, Binding binding, int state)

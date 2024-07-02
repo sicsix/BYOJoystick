@@ -67,7 +67,7 @@ namespace BYOJoystick.Controls.Sync
 
         private IEnumerator GrabbedEnumerator()
         {
-            while (true)
+            while (IsGrabbed)
             {
                 _grabTimer += Time.deltaTime;
                 if (_grabTimer > _grabTime || !IsGrabbed)

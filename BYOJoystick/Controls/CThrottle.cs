@@ -17,26 +17,40 @@ namespace BYOJoystick.Controls
         protected readonly VRThrottle              Throttle;
         protected readonly InteractableSyncWrapper SyncWrapper;
         protected readonly ThrottleGrabHandler     GrabHandler;
-        
-        protected          float                  ThrottleValue;
-        protected          float                  PreviousThrottleValue;
-        protected          float                  AboveGateThrottleValue;
-        protected          Vector3                ThumbstickVector;
-        protected          Vector3                DigitalThumbstickVector;
-        protected          bool                   ThumbstickWasZero;
-        protected          bool                   TriggerPressed;
-        protected          bool                   ThumbstickPressed;
-        protected          bool                   MenuButtonPressed;
-        protected readonly Func<VRThrottle, bool> GetRemoteOnly;
+
+        protected          float                     ThrottleValue;
+        protected          float                     PreviousThrottleValue;
+        protected          float                     ThrottleDeadzone;
+        protected          Vector3                   ThumbstickVector;
+        protected          Vector3                   DigitalThumbstickVector;
+        protected          bool                      ThumbstickWasZero;
+        protected          bool                      TriggerPressed;
+        protected          bool                      ThumbstickPressed;
+        protected          bool                      MenuButtonPressed;
+        protected readonly Func<VRThrottle, bool>    GetRemoteOnly;
+        protected readonly Func<VRThrottle, float>   GetGateAnimThrottle;
+        protected readonly Action<VRThrottle, float> SetGateAnimThrottle;
+        protected readonly Func<VRThrottle, bool>    GetBelowGate;
+        protected readonly Action<VRThrottle, bool>  SetBelowGate;
+        protected readonly Func<VRThrottle, float>   GetLastClickT;
+        protected readonly Action<VRThrottle, float> SetLastClickT;
+        protected readonly Action<VRThrottle, float> SetThrottle;
 
         protected readonly DigitalToAxisSmoothed ThrottleSmoothed = new DigitalToAxisSmoothed(0.25f, 1f, 2f);
 
         public CThrottle(VRInteractable interactable, VRThrottle throttle, bool isMulticrew)
         {
-            IsMP         = VTOLMPUtils.IsMultiplayer();
-            IsMulticrew  = isMulticrew;
-            Interactable = interactable;
-            Throttle     = throttle;
+            IsMP                = VTOLMPUtils.IsMultiplayer();
+            IsMulticrew         = isMulticrew;
+            Interactable        = interactable;
+            Throttle            = throttle;
+            GetGateAnimThrottle = CompiledExpressions.CreateFieldGetter<VRThrottle, float>("gateAnimThrottle");
+            SetGateAnimThrottle = CompiledExpressions.CreateFieldSetter<VRThrottle, float>("gateAnimThrottle");
+            GetBelowGate        = CompiledExpressions.CreateFieldGetter<VRThrottle, bool>("belowGate");
+            SetBelowGate        = CompiledExpressions.CreateFieldSetter<VRThrottle, bool>("belowGate");
+            GetLastClickT       = CompiledExpressions.CreateFieldGetter<VRThrottle, float>("lastClickT");
+            SetLastClickT       = CompiledExpressions.CreateFieldSetter<VRThrottle, float>("lastClickT");
+            SetThrottle         = CompiledExpressions.CreateFieldSetter<VRThrottle, float>("throttle");
 
             if (!IsMP || !IsMulticrew)
                 return;
@@ -51,7 +65,7 @@ namespace BYOJoystick.Controls
         public virtual void PostUpdate()
         {
             if (ThrottleSmoothed.Calculate())
-                SetThrottleValue(Throttle.currentThrottle + ThrottleSmoothed.Delta, true);
+                SetThrottleValue(ThrottleValue + ThrottleSmoothed.Delta, true);
             else if (ThrottleValue != PreviousThrottleValue)
                 SetThrottleValue(ThrottleValue, false);
 
@@ -75,31 +89,101 @@ namespace BYOJoystick.Controls
             DigitalThumbstickVector = Vector3.zero;
         }
 
-        protected void SetThrottleValue(float value, bool isButtonInput)
+        protected void SetThrottleValue(float throttle, bool isButtonInput)
         {
+            ThrottleValue = throttle;
+            throttle      = Mathf.Clamp(throttle, Throttle.minThrottle, Mathf.Clamp01(Throttle.throttleLimiter));
+            bool sendEvents = Throttle.sendEvents;
+            Throttle.sendEvents = true;
+
             if (!IsMP || !IsMulticrew)
             {
+                UpdateThrottle(throttle);
                 PreviousThrottleValue = ThrottleValue;
-                Throttle.RemoteSetThrottleForceEvents(ThrottleValue);
             }
             else
             {
-                float delta = Mathf.Abs(value - PreviousThrottleValue);
-                if (isButtonInput || (delta > 0.01f && !GrabHandler.IsGrabbed) || GrabHandler.IsGrabbed)
+                float delta = Mathf.Abs(ThrottleValue - PreviousThrottleValue);
+                if (isButtonInput || (delta > Mathf.Max(0.005f, ThrottleDeadzone) && !GrabHandler.IsGrabbed) || (GrabHandler.IsGrabbed && delta > ThrottleDeadzone / 2f))
+                {
+                    PreviousThrottleValue = ThrottleValue;
                     GrabHandler.GrabThrottle(1.5f);
-                
-                PreviousThrottleValue = ThrottleValue;
+                }
 
-                SyncWrapper?.TryInteractTimed(true, 0.5f);
-
-                if (GrabHandler.IsGrabbed && !GetRemoteOnly(Throttle))
-                    Throttle.RemoteSetThrottle(ThrottleValue);
+                if (SyncWrapper == null || SyncWrapper.TryInteractTimed(true, 0.5f))
+                {
+                    if (GrabHandler.IsGrabbed && !GetRemoteOnly(Throttle))
+                        UpdateThrottle(throttle);
+                }
             }
+
+            Throttle.sendEvents = sendEvents;
+        }
+
+        private void UpdateThrottle(float throttle)
+        {
+            if (Throttle.abGate)
+            {
+                bool throttleUpdated = false;
+                if (throttle > Throttle.abGateThreshold && throttle < 1f - Throttle.abPostGateWidth)
+                {
+                    float gateAnimThrottle = Mathf.Lerp(GetGateAnimThrottle(Throttle), Mathf.Lerp(Throttle.abGateThreshold, throttle, 0.25f), 25f * Time.deltaTime);
+                    SetGateAnimThrottle(Throttle, gateAnimThrottle);
+                    throttle = Throttle.abGateThreshold;
+                    Throttle.UpdateThrottle(throttle);
+                    Throttle.UpdateThrottleAnim(gateAnimThrottle);
+                    SetThrottle(Throttle, throttle);
+                    throttleUpdated = true;
+                }
+                else if (throttle >= 1f - Throttle.abPostGateWidth)
+                {
+                    throttle = 1f;
+                    float gateAnimThrottle = Mathf.Lerp(GetGateAnimThrottle(Throttle), 1f, 25f * Time.deltaTime);
+                    SetGateAnimThrottle(Throttle, gateAnimThrottle);
+                    Throttle.UpdateThrottleAnim(gateAnimThrottle);
+                    Throttle.UpdateThrottle(throttle);
+                    SetThrottle(Throttle, throttle);
+                    throttleUpdated = true;
+                }
+                else
+                    SetGateAnimThrottle(Throttle, throttle);
+
+                if (throttle > Throttle.abGateThreshold + 0.01f)
+                {
+                    if (GetBelowGate(Throttle))
+                    {
+                        SetBelowGate(Throttle, false);
+                        if (Throttle.gateAudioSource != null)
+                            Throttle.gateAudioSource.PlayOneShot(Throttle.gateABSound);
+                    }
+                }
+                else if (!GetBelowGate(Throttle))
+                {
+                    SetBelowGate(Throttle, true);
+                    if (Throttle.gateAudioSource != null)
+                        Throttle.gateAudioSource.PlayOneShot(Throttle.gateMilSound);
+                }
+
+                if (throttleUpdated)
+                    return;
+            }
+
+            if (Throttle.audioSource != null && Mathf.Abs(throttle - GetLastClickT(Throttle)) > Throttle.throttleClickInterval)
+            {
+                SetLastClickT(Throttle, throttle);
+                Throttle.audioSource.volume = throttle;
+                Throttle.audioSource.PlayOneShot(Throttle.throttleClickSound);
+            }
+
+            Throttle.UpdateThrottleAnim(throttle);
+            Throttle.UpdateThrottle(throttle);
+            SetThrottle(Throttle, throttle);
         }
 
         public static void Set(CThrottle c, Binding binding, int state)
         {
-            c.ThrottleValue = binding.GetAsFloat();
+            c.ThrottleValue    = ((JoystickBinding)binding).GetAsFloat();
+            c.ThrottleDeadzone = ((JoystickBinding)binding).Deadzone;
         }
 
         public static void Increase(CThrottle c, Binding binding, int state)
@@ -170,12 +254,12 @@ namespace BYOJoystick.Controls
 
         public static void SetThumbstickX(CThrottle c, Binding binding, int state)
         {
-            c.ThumbstickVector.y = binding.GetAsFloatCentered();
+            c.ThumbstickVector.y = ((JoystickBinding)binding).GetAsFloatCentered();
         }
 
         public static void SetThumbstickY(CThrottle c, Binding binding, int state)
         {
-            c.ThumbstickVector.y = binding.GetAsFloatCentered();
+            c.ThumbstickVector.y = ((JoystickBinding)binding).GetAsFloatCentered();
         }
 
         public static void ThumbstickUp(CThrottle c, Binding binding, int state)

@@ -211,12 +211,12 @@ namespace BYOJoystick.Controls
 
         public static void SlewX(CSOI c, Binding binding, int state)
         {
-            c.SlewVector.x = binding.GetAsFloatCentered();
+            c.SlewVector.x = ((JoystickBinding)binding).GetAsFloatCentered();
         }
 
         public static void SlewY(CSOI c, Binding binding, int state)
         {
-            c.SlewVector.y = binding.GetAsFloatCentered();
+            c.SlewVector.y = ((JoystickBinding)binding).GetAsFloatCentered();
         }
 
         public static void SlewUp(CSOI c, Binding binding, int state)

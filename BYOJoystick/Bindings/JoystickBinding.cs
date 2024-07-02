@@ -39,6 +39,7 @@ namespace BYOJoystick.Bindings
             return !IsButton(offset) && !IsPOV(offset);
         }
 
+
         private bool _modifierActive;
         private bool _buttonActive;
         private bool _axisActive;
@@ -108,16 +109,15 @@ namespace BYOJoystick.Bindings
             }
         }
 
-        public override float GetAsFloat()
+        public float GetAsFloat()
         {
             if (!IsAxis(Offset))
                 return 0f;
 
-            float value = Invert ? 1f - (float)_value / AxisMax : (float)_value / AxisMax;
-            return value < Deadzone ? 0f : value;
+            return Invert ? 1f - (float)_value / AxisMax : (float)_value / AxisMax;
         }
 
-        public override float GetAsFloatCentered()
+        public float GetAsFloatCentered()
         {
             if (!IsAxis(Offset))
                 return 0f;
@@ -125,6 +125,15 @@ namespace BYOJoystick.Bindings
             float value = Invert ? 1f - (float)_value / AxisMax : (float)_value / AxisMax;
             value = (value - 0.5f) * 2f;
             return Math.Abs(value) < Deadzone ? 0f : value;
+        }
+
+        public float GetAsFloatCenteredNoDeadzone()
+        {
+            if (!IsAxis(Offset))
+                return 0f;
+
+            float value = Invert ? 1f - (float)_value / AxisMax : (float)_value / AxisMax;
+            return (value - 0.5f) * 2f;
         }
 
         private void ResetCenteredAxis()

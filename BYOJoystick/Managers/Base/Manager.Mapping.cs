@@ -375,7 +375,7 @@ namespace BYOJoystick.Managers.Base
             var centerStickRoot = centerStickRootPath != null ? GetGameObject(centerStickRootPath) : null;
             var sideStick       = FindComponent<VRJoystick>(sideStickRoot);
             var centerStick     = centerStickRootPath != null ? FindComponent<VRJoystick>(centerStickRoot) : null;
-            var control         = new CJoystick(sideStick, centerStick, IsMulticrew);
+            var control         = new CJoystick(sideStick, centerStick, IsMulticrew, true);
             Controls.Add(name, control);
             return control;
         }

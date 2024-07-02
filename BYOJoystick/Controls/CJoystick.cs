@@ -11,10 +11,11 @@ namespace BYOJoystick.Controls
 {
     public class CJoystick : IControl
     {
-        public static List<CJoystick> Instances = new List<CJoystick>();
+        public static readonly List<CJoystick> Instances = new List<CJoystick>();
 
         protected readonly bool IsMP;
         protected readonly bool IsMulticrew;
+        protected readonly bool HasJoystickAxes;
 
         protected readonly VRJoystick              SideJoystick;
         protected readonly InteractableSyncWrapper SideJoystickSyncWrapper;
@@ -27,6 +28,9 @@ namespace BYOJoystick.Controls
 
         protected          Vector3                JoystickVector;
         protected          Vector3                PreviousJoystickVector;
+        protected          float                  PitchDeadzone;
+        protected          float                  RollDeadzone;
+        protected          float                  YawDeadzone;
         protected          Vector3                ThumbstickVector;
         protected          Vector3                DigitalThumbstickVector;
         protected          bool                   ThumbstickWasZero;
@@ -34,14 +38,12 @@ namespace BYOJoystick.Controls
         protected          bool                   ThumbstickPressed;
         protected          bool                   MenuButtonPressed;
         protected readonly Func<VRJoystick, bool> GetRemoteOnly;
-        protected          float                  ReleaseTimer;
-        private const      float                  ReleaseTime = 1.5f;
 
 
         protected readonly DigitalToAxisSmoothed ThumbstickXSmoothed = new DigitalToAxisSmoothed(0.25f, 1f, 1f);
         protected readonly DigitalToAxisSmoothed ThumbstickYSmoothed = new DigitalToAxisSmoothed(0.25f, 1f, 1f);
 
-        public CJoystick(VRJoystick sideJoystick, VRJoystick centerJoystick, bool isMulticrew)
+        public CJoystick(VRJoystick sideJoystick, VRJoystick centerJoystick, bool isMulticrew, bool hasJoystickAxes)
         {
             Instances.Add(this);
             IsMP                                  = VTOLMPUtils.IsMultiplayer();
@@ -49,6 +51,7 @@ namespace BYOJoystick.Controls
             SideJoystick                          = sideJoystick;
             CenterJoystick                        = centerJoystick;
             HasCenterJoystick                     = centerJoystick != null;
+            HasJoystickAxes                       = hasJoystickAxes;
             SideJoystick.returnToZeroWhenReleased = false;
             if (HasCenterJoystick)
                 CenterJoystick.returnToZeroWhenReleased = false;
@@ -64,11 +67,12 @@ namespace BYOJoystick.Controls
             SideJoystickSyncWrapper = InteractableSyncWrapper.Create(sideJoystickInteractable);
             SideJoystickGrabHandler = JoystickGrabHandler.Create(sideJoystick, connectedJoysticks, muvs, sideJoystickInteractable);
 
-            if (!HasCenterJoystick)
-                return;
-            var centerJoystickInteractable = centerJoystick.GetComponent<VRInteractable>();
-            CenterJoystickSyncWrapper = InteractableSyncWrapper.Create(centerJoystickInteractable);
-            CenterJoystickGrabHandler = JoystickGrabHandler.Create(centerJoystick, connectedJoysticks, muvs, centerJoystickInteractable);
+            if (HasCenterJoystick)
+            {
+                var centerJoystickInteractable = centerJoystick.GetComponent<VRInteractable>();
+                CenterJoystickSyncWrapper = InteractableSyncWrapper.Create(centerJoystickInteractable);
+                CenterJoystickGrabHandler = JoystickGrabHandler.Create(centerJoystick, connectedJoysticks, muvs, centerJoystickInteractable);
+            }
         }
 
         [HarmonyPatch(typeof(ConnectedJoystickSync), nameof(ConnectedJoystickSync.RPC_ForceRelease))]
@@ -76,20 +80,31 @@ namespace BYOJoystick.Controls
         {
             static void Prefix(int excludeIdx)
             {
+                // TODO BUG This should fix the override control on T-55 but never gets called for some reason
                 for (int i = 0; i < Instances.Count; i++)
                 {
-                    var side = Instances[i].SideJoystickGrabHandler;
-                    if (side != null)
+                    var sideJoystickGrabHandler = Instances[i].SideJoystickGrabHandler;
+                    var sideJoystickSyncWrapper = Instances[i].SideJoystickSyncWrapper;
+                    if (sideJoystickGrabHandler != null)
                     {
-                        if (side.ControlIndex != excludeIdx && side.IsGrabbed)
-                            side.ReleaseStick();
+                        if (sideJoystickGrabHandler.ControlIndex == excludeIdx)
+                            continue;
+                        
+                        if (sideJoystickGrabHandler.IsGrabbed)
+                            sideJoystickGrabHandler.ReleaseStick();
+                        sideJoystickSyncWrapper?.StopInteracting(true);
                     }
 
-                    var center = Instances[i].CenterJoystickGrabHandler;
-                    if (center != null)
+                    var centerJoystickGrabHandler = Instances[i].CenterJoystickGrabHandler;
+                    var centerJoystickSyncWrapper = Instances[i].CenterJoystickSyncWrapper;
+                    if (centerJoystickGrabHandler != null)
                     {
-                        if (center.ControlIndex != excludeIdx && center.IsGrabbed)
-                            center.ReleaseStick();
+                        if (centerJoystickGrabHandler.ControlIndex == excludeIdx)
+                            continue;
+                        
+                        if (centerJoystickGrabHandler.IsGrabbed)
+                            centerJoystickGrabHandler.ReleaseStick();
+                        centerJoystickSyncWrapper.StopInteracting(true);
                     }
                 }
             }
@@ -101,56 +116,51 @@ namespace BYOJoystick.Controls
             bool isSideJoystickActive = SideJoystick.gameObject.activeInHierarchy;
             var  joystick             = isSideJoystickActive || !HasCenterJoystick ? SideJoystick : CenterJoystick;
 
-            if (!IsMP || !IsMulticrew)
+            if (HasJoystickAxes)
             {
-                if (JoystickVector != PreviousJoystickVector)
+                if (!IsMP || !IsMulticrew)
                 {
-                    PreviousJoystickVector = JoystickVector;
-                    joystick.RemoteSetStick(JoystickVector);
-                    joystick.OnSetStick?.Invoke(JoystickVector);
-                    joystick.OnSetSteer?.Invoke(JoystickVector.y);
-                }
-            }
-            else
-            {
-                var syncWrapper = isSideJoystickActive ? SideJoystickSyncWrapper : CenterJoystickSyncWrapper;
-                var grabHandler = isSideJoystickActive ? SideJoystickGrabHandler : CenterJoystickGrabHandler;
-
-                float magnitude = Mathf.Max(new Vector2(JoystickVector.x, JoystickVector.z).magnitude, Mathf.Abs(JoystickVector.y));
-
-                if (grabHandler.IsGrabbed)
-                {
-                    if (magnitude > 0.03f)
-                        ReleaseTimer = 0f;
-                    else
+                    if (JoystickVector != PreviousJoystickVector)
                     {
-                        ReleaseTimer += Time.deltaTime;
-                        if (ReleaseTimer > ReleaseTime)
-                            grabHandler.ReleaseStick();
+                        PreviousJoystickVector = JoystickVector;
+                        joystick.RemoteSetStick(JoystickVector);
+                        joystick.OnSetStick?.Invoke(JoystickVector);
+                        joystick.OnSetSteer?.Invoke(JoystickVector.y);
                     }
                 }
                 else
                 {
-                    if (magnitude > 0.15f)
+                    var syncWrapper = isSideJoystickActive ? SideJoystickSyncWrapper : CenterJoystickSyncWrapper;
+                    var grabHandler = isSideJoystickActive ? SideJoystickGrabHandler : CenterJoystickGrabHandler;
+
+                    float pMag = Mathf.Abs(JoystickVector.x);
+                    float yMag = Mathf.Abs(JoystickVector.y);
+                    float rMag = Mathf.Abs(JoystickVector.z);
+
+                    if (!grabHandler.IsGrabbed && (pMag > Mathf.Max(0.005f, PitchDeadzone) || yMag > Mathf.Max(0.005f, YawDeadzone) || rMag > Mathf.Max(0.005f, RollDeadzone))
+                     || (grabHandler.IsGrabbed
+                      && (pMag > Mathf.Max(0.005f, PitchDeadzone / 2f) || yMag > Mathf.Max(0.005f, YawDeadzone / 2f) || rMag > Mathf.Max(0.005f, RollDeadzone / 2f))))
                     {
-                        grabHandler.GrabStick();
-                        ReleaseTimer = 0f;
+                        Plugin.Log($"Grabbing stick X: {JoystickVector.x}, Y: {JoystickVector.y}, Z: {JoystickVector.z}");
+                        Plugin.Log($"Deadzones: Pitch: {PitchDeadzone}, Yaw: {YawDeadzone}, Roll: {RollDeadzone}");
+                        grabHandler.GrabStick(1.5f);
                     }
-                }
 
-                if (JoystickVector != PreviousJoystickVector)
-                {
-                    PreviousJoystickVector = JoystickVector;
-
-                    syncWrapper?.TryInteractTimed(true, 0.5f);
-
-                    if (grabHandler.IsGrabbed && !GetRemoteOnly(joystick))
+                    if (JoystickVector != PreviousJoystickVector)
                     {
-                        joystick.RemoteSetStick(JoystickVector);
-                        if (joystick.sendEvents)
+                        PreviousJoystickVector = JoystickVector;
+
+                        if (syncWrapper == null || syncWrapper.TryInteractTimed(true, 0.5f))
                         {
-                            joystick.OnSetStick?.Invoke(JoystickVector);
-                            joystick.OnSetSteer?.Invoke(JoystickVector.y);
+                            if (grabHandler.IsGrabbed && !GetRemoteOnly(joystick))
+                            {
+                                joystick.RemoteSetStick(JoystickVector);
+                                if (joystick.sendEvents)
+                                {
+                                    joystick.OnSetStick?.Invoke(JoystickVector);
+                                    joystick.OnSetSteer?.Invoke(JoystickVector.y);
+                                }
+                            }
                         }
                     }
                 }
@@ -184,17 +194,20 @@ namespace BYOJoystick.Controls
 
         public static void SetPitch(CJoystick c, Binding binding, int state)
         {
-            c.JoystickVector.x = -binding.GetAsFloatCentered();
+            c.JoystickVector.x = -((JoystickBinding)binding).GetAsFloatCenteredNoDeadzone();
+            c.PitchDeadzone    = ((JoystickBinding)binding).Deadzone;
         }
 
         public static void SetYaw(CJoystick c, Binding binding, int state)
         {
-            c.JoystickVector.y = binding.GetAsFloatCentered();
+            c.JoystickVector.y = ((JoystickBinding)binding).GetAsFloatCenteredNoDeadzone();
+            c.RollDeadzone     = ((JoystickBinding)binding).Deadzone;
         }
 
         public static void SetRoll(CJoystick c, Binding binding, int state)
         {
-            c.JoystickVector.z = -binding.GetAsFloatCentered();
+            c.JoystickVector.z = -((JoystickBinding)binding).GetAsFloatCenteredNoDeadzone();
+            c.YawDeadzone      = ((JoystickBinding)binding).Deadzone;
         }
 
         public static void MenuButton(CJoystick c, Binding binding, int state)
@@ -249,12 +262,12 @@ namespace BYOJoystick.Controls
 
         public static void SetThumbstickX(CJoystick c, Binding binding, int state)
         {
-            c.ThumbstickVector.x = binding.GetAsFloatCentered();
+            c.ThumbstickVector.x = ((JoystickBinding)binding).GetAsFloatCentered();
         }
 
         public static void SetThumbstickY(CJoystick c, Binding binding, int state)
         {
-            c.ThumbstickVector.y = binding.GetAsFloatCentered();
+            c.ThumbstickVector.y = ((JoystickBinding)binding).GetAsFloatCentered();
         }
 
         public static void ThumbstickUp(CJoystick c, Binding binding, int state)

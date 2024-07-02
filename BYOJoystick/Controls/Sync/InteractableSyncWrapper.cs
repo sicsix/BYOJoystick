@@ -33,7 +33,7 @@ namespace BYOJoystick.Controls.Sync
             {
                 if (_iSync.exclusive && exclusiveUser != 0L && exclusiveUser != BDSteamClient.mySteamID)
                 {
-                    IsInteracting = false;
+                    StopInteracting(isRightCon);
                     return false;
                 }
                 SetTimer(time);
@@ -111,7 +111,7 @@ namespace BYOJoystick.Controls.Sync
 
         private IEnumerator InteractingCoroutine()
         {
-            while (true)
+            while (IsInteracting)
             {
                 _interactTimer += Time.deltaTime;
                 if (_interactTimer > _interactTime || !IsInteracting)

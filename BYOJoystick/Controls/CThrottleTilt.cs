@@ -58,7 +58,7 @@ namespace BYOJoystick.Controls
 
         public static void SetTiltTarget(CThrottleTilt c, Binding binding, int state)
         {
-            c.TiltTarget        = binding.GetAsFloat();
+            c.TiltTarget        = ((JoystickBinding)binding).GetAsFloat();
             c.TiltTargetReached = false;
         }
 

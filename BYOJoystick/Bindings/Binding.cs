@@ -13,9 +13,6 @@ namespace BYOJoystick.Bindings
             Action = action;
         }
 
-        public abstract float GetAsFloat();
-        public abstract float GetAsFloatCentered();
-
         public abstract bool GetAsBool();
 
         public abstract string GetDisplayString();

@@ -19,7 +19,13 @@ namespace BYOJoystick.Managers
 
         private CJoystick RightStick(string name, string root, bool nullable, bool checkName, int idx)
         {
-            return GetJoysticksByPaths(name, RightJoystick, null);
+            if (TryGetExistingControl<CJoystick>(name, out var existingControl))
+                return existingControl;
+            var sideStickRoot = GetGameObject(RightJoystick);
+            var sideStick     = FindComponent<VRJoystick>(sideStickRoot);
+            var control       = new CJoystick(sideStick, null, IsMulticrew, false);
+            Controls.Add(name, control);
+            return control;
         }
 
         protected override void PreMapping()

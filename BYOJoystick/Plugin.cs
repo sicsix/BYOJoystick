@@ -1,5 +1,6 @@
 using System.Collections;
 using System.IO;
+using System.Reflection;
 using Harmony;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace BYOJoystick
             base.ModLoaded();
             
             Log("Creating Harmony Patches");
-            HarmonyInstance.Create("com.BYOJoystick").PatchAll();
+            HarmonyInstance.Create("com.BYOJoystick").PatchAll(Assembly.GetExecutingAssembly());
             
             StartCoroutine(LoadAssetBundle());
         }

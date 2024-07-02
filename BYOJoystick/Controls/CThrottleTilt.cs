@@ -19,9 +19,9 @@ namespace BYOJoystick.Controls
         public override void PostUpdate()
         {
             if (ThrottleSmoothed.Calculate())
-                SetThrottleValue(Throttle.currentThrottle + ThrottleSmoothed.Delta);
+                SetThrottleValue(Throttle.currentThrottle + ThrottleSmoothed.Delta, true);
             else if (ThrottleValue != PreviousThrottleValue)
-                SetThrottleValue(ThrottleValue);
+                SetThrottleValue(ThrottleValue, false);
 
             if (TiltSmoothed.Calculate())
                 DigitalThumbstickVector.y = TiltSmoothed.Value;
@@ -58,7 +58,7 @@ namespace BYOJoystick.Controls
 
         public static void SetTiltTarget(CThrottleTilt c, Binding binding, int state)
         {
-            c.TiltTarget        = binding.GetAsFloat();
+            c.TiltTarget        = ((JoystickBinding)binding).GetAsFloat();
             c.TiltTargetReached = false;
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using UnityEngine;
 using VTOLVR.Multiplayer;
 
 namespace BYOJoystick.Controls.Sync
@@ -15,12 +16,10 @@ namespace BYOJoystick.Controls.Sync
         private readonly MultiUserVehicleSync            _muvs;
         private readonly Action<ConnectedJoysticks, int> _onLocalGrabbedStick;
         private readonly Action<ConnectedJoysticks, int> _onLocalReleasedStick;
+        private          float                           _grabTimer;
+        private          float                           _grabTime;
 
-        private JoystickGrabHandler(VRJoystick           joystick,
-                                    ConnectedJoysticks   jSync,
-                                    int                  controlIndex,
-                                    MultiUserVehicleSync muvs,
-                                    VRInteractable       interactable)
+        private JoystickGrabHandler(VRJoystick joystick, ConnectedJoysticks jSync, int controlIndex, MultiUserVehicleSync muvs, VRInteractable interactable)
         {
             _interactable         = interactable;
             _joystick             = joystick;
@@ -42,8 +41,13 @@ namespace BYOJoystick.Controls.Sync
             return ctrlIdx == -1 ? null : new JoystickGrabHandler(joystick, jSync, ctrlIdx, muvs, interactable);
         }
 
-        public void GrabStick()
+        public void GrabStick(float time)
         {
+            _grabTime  = time;
+            _grabTimer = 0;
+            if (IsGrabbed)
+                return;
+
             IsGrabbed = true;
             _jSync.OnGrabbedStick(ControlIndex);
             _muvs.OnControlInteract(_interactable);
@@ -55,6 +59,13 @@ namespace BYOJoystick.Controls.Sync
         {
             while (IsGrabbed)
             {
+                _grabTimer += Time.deltaTime;
+                if (_grabTimer > _grabTime || !IsGrabbed)
+                {
+                    ReleaseStick();
+                    yield break;
+                }
+
                 _muvs.OnControlInteracting();
                 yield return null;
             }

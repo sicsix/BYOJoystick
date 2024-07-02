@@ -88,7 +88,7 @@ namespace BYOJoystick.Controls
 
         public static void SetArtic(CCollFuncs c, Binding binding, int state)
         {
-            c.ArticulateValue = binding.GetAsFloatCentered();
+            c.ArticulateValue = ((JoystickBinding)binding).GetAsFloatCentered();
         }
 
         public static void ArticUp(CCollFuncs c, Binding binding, int state)

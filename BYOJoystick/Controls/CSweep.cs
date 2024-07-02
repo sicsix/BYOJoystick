@@ -23,24 +23,20 @@ namespace BYOJoystick.Controls
         {
             if (LeverSmoothed.Calculate())
                 SetLeverValue(1 - Lever.CurrentOutput + LeverSmoothed.Delta);
-            else
+            else if (LeverValue != PreviousLeverValue)
                 SetLeverValue(LeverValue);
         }
 
         private void SetLeverValue(float value)
         {
-            float delta = Mathf.Abs(value - PreviousLeverValue);
-            if (delta < 0.01f)
-                return;
-
-            Lever.RemoteSetManual(1f - value);
-            PreviousLeverValue = value;
-            LeverValue         = value;
+            LeverValue         = Mathf.Clamp01(value);
+            PreviousLeverValue = LeverValue;
+            Lever.RemoteSetManual(1f - LeverValue);
         }
 
         public static void Set(CSweep c, Binding binding, int state)
         {
-            c.LeverValue = binding.GetAsFloat();
+            c.LeverValue = ((JoystickBinding)binding).GetAsFloat();
         }
 
         public static void Forward(CSweep c, Binding binding, int state)

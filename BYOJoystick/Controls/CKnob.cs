@@ -43,7 +43,7 @@ namespace BYOJoystick.Controls
 
         public static void Set(CKnob c, Binding binding, int state)
         {
-            c.SetKnobValue(binding.GetAsFloat());
+            c.SetKnobValue(((JoystickBinding)binding).GetAsFloat());
         }
 
         public static void Increase(CKnob c, Binding binding, int state)

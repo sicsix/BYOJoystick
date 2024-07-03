@@ -17,7 +17,6 @@ namespace BYOJoystick.Managers
         private static string Seat           => "FrontSeatParent";
         private static string SideJoystick   => "PassengerOnlyObjs/FrontCockpit/SideStickObjects (Front)";
         private static string CenterJoystick => "PassengerOnlyObjs/FrontCockpit/CenterStickObjects (Front)";
-        private static string TSD            => "PassengerOnlyObjs/FrontCockpit/DashTransform/touchScreenArea/MFDPortals/poweredObj/-- pages --/TacticalSituationDisplay";
 
         private CJoystick Joysticks(string name, string root, bool nullable, bool checkName, int idx)
         {
@@ -176,12 +175,12 @@ namespace BYOJoystick.Managers
 
         protected override void CreateHUDControls()
         {
-            HUDButton("Helmet Visor Toggle", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.ToggleVisor, r: Seat);
-            HUDButton("Helmet Visor Open", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.OpenVisor, r: Seat);
-            HUDButton("Helmet Visor Closed", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.CloseVisor, r: Seat);
-            HUDButton("Helmet NV Toggle", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.ToggleNightVision, r: Seat);
-            HUDButton("Helmet NV On", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.EnableNightVision, r: Seat);
-            HUDButton("Helmet NV Off", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.DisableNightVision, r: Seat);
+            HUDButton("Helmet Visor Toggle", "Helmet", HelmetController, CHelmet.ToggleVisor);
+            HUDButton("Helmet Visor Open", "Helmet", HelmetController, CHelmet.OpenVisor);
+            HUDButton("Helmet Visor Closed", "Helmet", HelmetController, CHelmet.CloseVisor);
+            HUDButton("Helmet NV Toggle", "Helmet", HelmetController, CHelmet.ToggleNightVision);
+            HUDButton("Helmet NV On", "Helmet", HelmetController, CHelmet.EnableNightVision);
+            HUDButton("Helmet NV Off", "Helmet", HelmetController, CHelmet.DisableNightVision);
 
             HUDButton("HUD Power Toggle", "HUD Power", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, i: 0);
             HUDButton("HUD Power On", "HUD Power", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 0);
@@ -214,8 +213,8 @@ namespace BYOJoystick.Managers
             DisplayButton("SOI Zoom In", "SOI", SOI, CSOI.ZoomIn);
             DisplayButton("SOI Zoom Out", "SOI", SOI, CSOI.ZoomOut);
 
-            DisplayButton("TSD Slew TGP/EOTS", "Slew TGP", TSDInteractable, CInteractable.Use, r: TSD);
-            DisplayButton("TSD GPS-S", "GPS Send", TSDInteractable, CInteractable.Use, r: TSD);
+            DisplayButton("TSD Slew TGP/EOTS", "Slew TGP", TSDInteractable, CInteractable.Use);
+            DisplayButton("TSD GPS-S", "GPS Send", TSDInteractable, CInteractable.Use);
 
             DisplayAxis("MFD Brightness", "MFD Brightness (Front)", ByManifest<VRTwistKnob, CKnob>, CKnob.Set, i: 5);
             DisplayButton("MFD Brightness Increase", "MFD Brightness (Front)", ByManifest<VRTwistKnob, CKnob>, CKnob.Increase, i: 5);
@@ -349,17 +348,6 @@ namespace BYOJoystick.Managers
             var cEF24Hotas        = new CEF24Hotas(ef24Hotas, setArmingAAButton, setArmingAGButton);
             Controls.Add(name, cEF24Hotas);
             return cEF24Hotas;
-        }
-
-        private CInteractable TSDInteractable(string name, string root, bool nullable, bool checkName, int idx)
-        {
-            if (TryGetExistingControl<CInteractable>(name, out var existingControl))
-                return existingControl;
-            var tsd           = FindComponent<MFDPTacticalSituationDisplay>(Vehicle);
-            var interactable  = FindInteractable(name, tsd.GetComponentsInChildren<VRInteractable>(true));
-            var cInteractable = new CInteractable(interactable);
-            Controls.Add(name, cInteractable);
-            return cInteractable;
         }
     }
 }

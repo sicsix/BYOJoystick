@@ -12,7 +12,6 @@ namespace BYOJoystick.Managers
 
         private static string SideJoystick   => "Local/JoystickObjects/SideStickObjects";
         private static string CenterJoystick => "Local/JoystickObjects/CenterStickObjects";
-        private static string TSD            => "Local/DashCanvas/Dash/touchScreenArea/MFDPortals/poweredObj/TacticalSituationDisplay";
 
         private CJoystick Joysticks(string name, string root, bool nullable, bool checkName, int idx)
         {
@@ -132,12 +131,12 @@ namespace BYOJoystick.Managers
 
         protected override void CreateHUDControls()
         {
-            HUDButton("Helmet Visor Toggle", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.ToggleVisor);
-            HUDButton("Helmet Visor Open", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.OpenVisor);
-            HUDButton("Helmet Visor Closed", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.CloseVisor);
-            HUDButton("Helmet NV Toggle", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.ToggleNightVision);
-            HUDButton("Helmet NV On", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.EnableNightVision);
-            HUDButton("Helmet NV Off", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.DisableNightVision);
+            HUDButton("Helmet Visor Toggle", "Helmet", HelmetController, CHelmet.ToggleVisor);
+            HUDButton("Helmet Visor Open", "Helmet", HelmetController, CHelmet.OpenVisor);
+            HUDButton("Helmet Visor Closed", "Helmet", HelmetController, CHelmet.CloseVisor);
+            HUDButton("Helmet NV Toggle", "Helmet", HelmetController, CHelmet.ToggleNightVision);
+            HUDButton("Helmet NV On", "Helmet", HelmetController, CHelmet.EnableNightVision);
+            HUDButton("Helmet NV Off", "Helmet", HelmetController, CHelmet.DisableNightVision);
 
             HUDButton("HMD Power Toggle", "HMD Power", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, i: 1);
             HUDButton("HMD Power On", "HMD Power", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 1);
@@ -166,8 +165,8 @@ namespace BYOJoystick.Managers
             DisplayButton("SOI Zoom In", "SOI", SOI, CSOI.ZoomIn);
             DisplayButton("SOI Zoom Out", "SOI", SOI, CSOI.ZoomOut);
 
-            DisplayButton("TSD Slew TGP/EOTS", "Slew EOTS", ByName<VRInteractable, CInteractable>, CInteractable.Use, r: TSD);
-            DisplayButton("TSD GPS-S", "GPS Send", ByName<VRInteractable, CInteractable>, CInteractable.Use, r: TSD);
+            DisplayButton("TSD Slew TGP/EOTS", "Slew EOTS", TSDInteractable, CInteractable.Use);
+            DisplayButton("TSD GPS-S", "GPS Send", TSDInteractable, CInteractable.Use);
 
             DisplayAxis("MFD Brightness", "MFD Brightness", ByManifest<VRTwistKnob, CKnob>, CKnob.Set, i: 0);
             DisplayButton("MFD Brightness Increase", "MFD Brightness", ByManifest<VRTwistKnob, CKnob>, CKnob.Increase, i: 0);

@@ -107,12 +107,12 @@ namespace BYOJoystick.Managers
 
         protected override void CreateHUDControls()
         {
-            HUDButton("Helmet Visor Toggle", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.ToggleVisor, r: Seat);
-            HUDButton("Helmet Visor Open", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.OpenVisor, r: Seat);
-            HUDButton("Helmet Visor Closed", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.CloseVisor, r: Seat);
-            HUDButton("Helmet NV Toggle", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.ToggleNightVision, r: Seat);
-            HUDButton("Helmet NV On", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.EnableNightVision, r: Seat);
-            HUDButton("Helmet NV Off", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.DisableNightVision, r: Seat);
+            HUDButton("Helmet Visor Toggle", "Helmet", HelmetController, CHelmet.ToggleVisor);
+            HUDButton("Helmet Visor Open", "Helmet", HelmetController, CHelmet.OpenVisor);
+            HUDButton("Helmet Visor Closed", "Helmet", HelmetController, CHelmet.CloseVisor);
+            HUDButton("Helmet NV Toggle", "Helmet", HelmetController, CHelmet.ToggleNightVision);
+            HUDButton("Helmet NV On", "Helmet", HelmetController, CHelmet.EnableNightVision);
+            HUDButton("Helmet NV Off", "Helmet", HelmetController, CHelmet.DisableNightVision);
 
             HUDButton("HMCS Power Toggle", "HMCS Power (Rear)", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle);
             HUDButton("HMCS Power On", "HMCS Power (Rear)", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1);
@@ -258,17 +258,6 @@ namespace BYOJoystick.Managers
             var cEF24Hotas        = new CEF24Hotas(ef24Hotas, setArmingAAButton, setArmingAGButton);
             Controls.Add(name, cEF24Hotas);
             return cEF24Hotas;
-        }
-
-        private CInteractable TSDInteractable(string name, string root, bool nullable, bool checkName, int idx)
-        {
-            if (TryGetExistingControl<CInteractable>(name, out var existingControl))
-                return existingControl;
-            var tsd           = FindComponent<MFDPTacticalSituationDisplay>(Vehicle);
-            var interactable  = FindInteractable(name, tsd.GetComponentsInChildren<VRInteractable>(true));
-            var cInteractable = new CInteractable(interactable);
-            Controls.Add(name, cInteractable);
-            return cInteractable;
         }
     }
 }

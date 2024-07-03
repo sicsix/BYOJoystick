@@ -122,12 +122,12 @@ namespace BYOJoystick.Managers
 
         protected override void CreateHUDControls()
         {
-            HUDButton("Helmet Visor Toggle", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.ToggleVisor);
-            HUDButton("Helmet Visor Open", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.OpenVisor);
-            HUDButton("Helmet Visor Closed", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.CloseVisor);
-            HUDButton("Helmet NV Toggle", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.ToggleNightVision);
-            HUDButton("Helmet NV On", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.EnableNightVision);
-            HUDButton("Helmet NV Off", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.DisableNightVision);
+            HUDButton("Helmet Visor Toggle", "Helmet", HelmetController, CHelmet.ToggleVisor);
+            HUDButton("Helmet Visor Open", "Helmet", HelmetController, CHelmet.OpenVisor);
+            HUDButton("Helmet Visor Closed", "Helmet", HelmetController, CHelmet.CloseVisor);
+            HUDButton("Helmet NV Toggle", "Helmet", HelmetController, CHelmet.ToggleNightVision);
+            HUDButton("Helmet NV On", "Helmet", HelmetController, CHelmet.EnableNightVision);
+            HUDButton("Helmet NV Off", "Helmet", HelmetController, CHelmet.DisableNightVision);
 
             HUDButton("HMD Power Toggle", "HMD Power (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, i: 3);
             HUDButton("HMD Power On", "HMD Power (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 3);

@@ -154,12 +154,12 @@ namespace BYOJoystick.Managers
 
         protected override void CreateHUDControls()
         {
-            HUDButton("Helmet Visor Toggle", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.ToggleVisor, r: Seat);
-            HUDButton("Helmet Visor Open", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.OpenVisor, r: Seat);
-            HUDButton("Helmet Visor Closed", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.CloseVisor, r: Seat);
-            HUDButton("Helmet NV Toggle", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.ToggleNightVision, r: Seat);
-            HUDButton("Helmet NV On", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.EnableNightVision, r: Seat);
-            HUDButton("Helmet NV Off", "Helmet", ByType<HelmetController, CHelmet>, CHelmet.DisableNightVision, r: Seat);
+            HUDButton("Helmet Visor Toggle", "Helmet", HelmetController, CHelmet.ToggleVisor);
+            HUDButton("Helmet Visor Open", "Helmet", HelmetController, CHelmet.OpenVisor);
+            HUDButton("Helmet Visor Closed", "Helmet", HelmetController, CHelmet.CloseVisor);
+            HUDButton("Helmet NV Toggle", "Helmet", HelmetController, CHelmet.ToggleNightVision);
+            HUDButton("Helmet NV On", "Helmet", HelmetController, CHelmet.EnableNightVision);
+            HUDButton("Helmet NV Off", "Helmet", HelmetController, CHelmet.DisableNightVision);
 
             HUDButton("HMCS Power Toggle", "HMCS Power (Front)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 1);
             HUDButton("HMCS Power On", "HMCS Power (Front)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 1);

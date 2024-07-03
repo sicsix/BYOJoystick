@@ -425,6 +425,49 @@ namespace BYOJoystick.Managers.Base
             return control;
         }
 
+        protected CInteractable TSDInteractable(string name, string root, bool nullable, bool checkName, int idx)
+        {
+            if (TryGetExistingControl<CInteractable>(name, out var existingControl))
+                return existingControl;
+            var tsd           = FindComponent<MFDPTacticalSituationDisplay>(Vehicle);
+            var interactable  = FindInteractable(name, tsd.GetComponentsInChildren<VRInteractable>(true));
+            var cInteractable = new CInteractable(interactable);
+            Controls.Add(name, cInteractable);
+            return cInteractable;
+        }
+
+        protected CHelmet HelmetController(string name, string root, bool nullable, bool checkName, int idx)
+        {
+            if (TryGetExistingControl<CHelmet>(name, out var existingControl))
+                return existingControl;
+
+            HelmetController helmetController = null;
+
+            var playerModelSyncs = Vehicle.GetComponentsInChildren<PlayerModelSync>(true);
+            for (int i = 0; i < playerModelSyncs.Length; i++)
+            {
+                var playerModelSync = playerModelSyncs[i];
+                if (playerModelSync.netEntity.isMine)
+                {
+                    helmetController = playerModelSync.localHelmet;
+                    if (helmetController == null)
+                        throw new InvalidOperationException("HelmetController not found on PlayerModelSync.");
+                    Plugin.Log("Found HelmetController on PlayerModelSync.");
+                    break;
+                }
+            }
+
+            if (helmetController == null)
+            {
+                helmetController = FindComponent<HelmetController>(Vehicle);
+                Plugin.Log("Found HelmetController as child of Vehicle.");
+            }
+
+            var control = new CHelmet(helmetController);
+            Controls.Add(name, control);
+            return control;
+        }
+
         protected static void ResetVRPosition(IControl control, Binding binding, int state)
         {
             if (binding.GetAsBool())

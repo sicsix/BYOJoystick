@@ -252,6 +252,45 @@ namespace BYOJoystick.Managers.Base
         {
             AddAction(name, ActionCategory.HUD, ActionInput.Button, controlName, mapper, action, s, r, n, c, i);
         }
+        
+         protected void NumPadAxis<T>(string                                   name,
+                                  string                                   controlName,
+                                  Func<string, string, bool, bool, int, T> mapper,
+                                  Action<T, Binding, int>                  action,
+                                  int                                      s = -1,
+                                  bool                                     n = false,
+                                  bool                                     c = true,
+                                  string                                   r = null,
+                                  int                                      i = -1) where T : IControl
+        {
+            AddAction(name, ActionCategory.NumPad, ActionInput.Axis, controlName, mapper, action, s, r, n, c, i);
+        }
+
+        protected void NumPadAxisC<T>(string                                   name,
+                                      string                                   controlName,
+                                      Func<string, string, bool, bool, int, T> mapper,
+                                      Action<T, Binding, int>                  action,
+                                      int                                      s = -1,
+                                      bool                                     n = false,
+                                      bool                                     c = true,
+                                      string                                   r = null,
+                                      int                                      i = -1) where T : IControl
+        {
+            AddAction(name, ActionCategory.NumPad, ActionInput.AxisCentered, controlName, mapper, action, s, r, n, c, i);
+        }
+
+        protected void NumPadButton<T>(string                                   name,
+                                       string                                   controlName,
+                                       Func<string, string, bool, bool, int, T> mapper,
+                                       Action<T, Binding, int>                  action,
+                                       int                                      s = -1,
+                                       bool                                     n = false,
+                                       bool                                     c = true,
+                                       string                                   r = null,
+                                       int                                      i = -1) where T : IControl
+        {
+            AddAction(name, ActionCategory.NumPad, ActionInput.Button, controlName, mapper, action, s, r, n, c, i);
+        }
 
         protected void DisplayAxis<T>(string                                   name,
                                       string                                   controlName,

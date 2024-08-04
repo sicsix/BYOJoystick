@@ -10,6 +10,7 @@ namespace BYOJoystick.Managers
         public override string ShortName   => "F45A";
         public override bool   IsMulticrew => false;
 
+        private static string MFDPortals     => "Local/DashCanvas/Dash/touchScreenArea/MFDPortals";
         private static string SideJoystick   => "Local/JoystickObjects/SideStickObjects";
         private static string CenterJoystick => "Local/JoystickObjects/CenterStickObjects";
 
@@ -71,15 +72,10 @@ namespace BYOJoystick.Managers
         {
             NavButton("A/P Nav Mode", "Nav Waypoint AP", ByName<VRInteractable, CInteractable>, CInteractable.Use);
             NavButton("A/P Hvr Mode", "Vertical Control AP Mode", ByManifest<VRButton, CButton>, CButton.Use, i: 20);
+            NavButton("A/P Speed Hold", "Speed AP", ByName<VRInteractable, CInteractable>, CInteractable.Use);
             NavButton("A/P Hdg Hold", "Heading AP", ByName<VRInteractable, CInteractable>, CInteractable.Use);
             NavButton("A/P Alt Hold", "Altitude AP", ByName<VRInteractable, CInteractable>, CInteractable.Use);
             NavButton("A/P Off", "AP Off", ByName<VRInteractable, CInteractable>, CInteractable.Use);
-
-            NavButton("A/P Alt Increase", "Alt +", ByManifest<VRButton, CButton>, CButton.Use, i: 14);
-            NavButton("A/P Alt Decrease", "Alt -", ByManifest<VRButton, CButton>, CButton.Use, i: 15);
-
-            NavButton("A/P Hdg Right", "Heading Right", ByManifest<VRButton, CButton>, CButton.Use, i: 12);
-            NavButton("A/P Hdg Left", "Heading Left", ByManifest<VRButton, CButton>, CButton.Use, i: 13);
 
             NavButton("Altitude Mode Toggle", "Altitude Mode", ByName<VRInteractable, CInteractable>, CInteractable.Use);
             NavButton("Clear Waypoint", "Clear Waypoint", ByManifest<VRButton, CButton>, CButton.Use, i: 24);
@@ -149,6 +145,22 @@ namespace BYOJoystick.Managers
             AddPostUpdateControl("HUD Brightness");
         }
 
+        protected override void CreateNumPadControls()
+        {
+            NumPadButton("1", "1", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("2", "2", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("3", "3", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("4", "4", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("5", "5", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("6", "6", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("7", "7", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("8", "8", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("9", "9", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("0", "0", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("Enter", "Enter", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+            NumPadButton("Clear", "Clear", ByName<VRButton, CButton>, CButton.Use, r: MFDPortals);
+        }
+
         protected override void CreateDisplayControls()
         {
             DisplayButton("SOI Slew Button", "SOI", SOI, CSOI.SlewButton);
@@ -195,7 +207,8 @@ namespace BYOJoystick.Managers
 
             RadioButton("Radio Channel Cycle", "Radio Channel", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle);
             RadioButton("Radio Channel Team", "Radio Channel", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 0);
-            RadioButton("Radio Channel Global", "Radio Channel", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1);
+            RadioButton("Radio Channel Freq", "Radio Channel", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1);
+            RadioButton("Radio Channel Global", "Radio Channel", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 2);
 
             RadioButton("Radio Mode Cycle", "Radio Mode", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle);
             RadioButton("Radio Mode Next", "Radio Mode", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Next);
@@ -237,13 +250,13 @@ namespace BYOJoystick.Managers
             LightsButton("Instrument Brightness Increase", "Instrument Brightness", ByManifest<VRTwistKnob, CKnob>, CKnob.Increase, i: 2);
             LightsButton("Instrument Brightness Decrease", "Instrument Brightness", ByManifest<VRTwistKnob, CKnob>, CKnob.Decrease, i: 2);
 
-            LightsButton("Formation Lights Toggle", "Formation Lights", ByManifest<VRLever, CLever>, CLever.Cycle, i: 8);
-            LightsButton("Formation Lights On", "Formation Lights", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 8);
-            LightsButton("Formation Lights Off", "Formation Lights", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 8);
-
             LightsButton("Nav Lights Toggle", "Nav Lights", ByManifest<VRLever, CLever>, CLever.Cycle, i: 7);
             LightsButton("Nav Lights On", "Nav Lights", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 7);
             LightsButton("Nav Lights Off", "Nav Lights", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 7);
+
+            LightsButton("Formation Lights Toggle", "Formation Lights", ByManifest<VRLever, CLever>, CLever.Cycle, i: 8);
+            LightsButton("Formation Lights On", "Formation Lights", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 8);
+            LightsButton("Formation Lights Off", "Formation Lights", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 8);
 
             LightsButton("Strobe Lights Toggle", "Strobe Lights", ByManifest<VRLever, CLever>, CLever.Cycle, i: 6);
             LightsButton("Strobe Lights On", "Strobe Lights", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 6);

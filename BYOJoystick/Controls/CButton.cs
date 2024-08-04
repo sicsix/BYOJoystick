@@ -23,7 +23,7 @@ namespace BYOJoystick.Controls
             SyncWrapper          = IsMP ? InteractableSyncWrapper.Create(interactable) : null;
             Button               = button;
             Pressed              = false;
-            SetInteracting       = CompiledExpressions.CreateFieldSetter<VRInteractable, bool>("interacting");
+            SetInteracting       = CompiledExpressions.CreatePropertySetter<VRInteractable, bool>("interacting");
             SetInteractedOnFrame = CompiledExpressions.CreateFieldSetter<VRInteractable, int>("interactedOnFrame");
         }
 

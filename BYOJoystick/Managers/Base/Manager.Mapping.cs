@@ -230,7 +230,7 @@ namespace BYOJoystick.Managers.Base
             return component;
         }
 
-        private U ToControl<T, U>(string name, VRInteractable interactable, T component) where T : MonoBehaviour where U : class, IControl
+        protected U ToControl<T, U>(string name, VRInteractable interactable, T component) where T : MonoBehaviour where U : class, IControl
         {
             IControl control;
             switch (component)

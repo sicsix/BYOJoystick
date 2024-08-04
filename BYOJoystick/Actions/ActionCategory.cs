@@ -8,6 +8,7 @@
         Navigation,
         Systems,
         HUD,
+        NumPad,
         Displays,
         Radio,
         Music,

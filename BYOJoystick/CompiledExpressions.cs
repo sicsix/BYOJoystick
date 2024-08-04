@@ -39,6 +39,22 @@ namespace BYOJoystick
             var lambda   = Expression.Lambda<Action<TClass, TField>>(assign, instance, value);
             return lambda.Compile();
         }
+        
+        public static Action<TClass, TProperty> CreatePropertySetter<TClass, TProperty>(string propertyName)
+        {
+            var propertyInfo = typeof(TClass).GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (propertyInfo == null)
+                throw new ArgumentException($"Property {propertyName} not found in {typeof(TClass).Name}");
+    
+            var instance = Expression.Parameter(typeof(TClass), "instance");
+            var value    = Expression.Parameter(typeof(TProperty), "value");
+            var property = Expression.Property(instance, propertyInfo);
+            var assign   = Expression.Assign(property, value);
+            var lambda   = Expression.Lambda<Action<TClass, TProperty>>(assign, instance, value);
+    
+            return lambda.Compile();
+        }
+
 
         public static Action<TClass, int> CreateEventInvoker<TClass>(string eventName)
         {

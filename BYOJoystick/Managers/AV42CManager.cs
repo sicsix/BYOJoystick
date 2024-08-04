@@ -11,6 +11,7 @@ namespace BYOJoystick.Managers
         public override string ShortName   => "AV42C";
         public override bool   IsMulticrew => false;
 
+        private static string Dash           => "Local/DashCanvas";
         private static string SideJoystick   => "Local/vtol4adjustableJoystick";
         private static string CenterJoystick => "Local/CenterStickObjects";
 
@@ -104,6 +105,7 @@ namespace BYOJoystick.Managers
         protected override void CreateNavigationControls()
         {
             NavButton("A/P Nav Mode", "Navigation Mode", ByManifest<VRButton, CButton>, CButton.Use, i: 19);
+            NavButton("A/P Spd Hold", "Speed Hold", ByName<VRButton, CButton>, CButton.Use);
             NavButton("A/P Hvr Mode", "Hover Mode", ByManifest<VRButton, CButton>, CButton.Use, i: 17);
             NavButton("A/P Hdg Hold", "Heading Hold", ByManifest<VRButton, CButton>, CButton.Use, i: 15);
             NavButton("A/P Alt Hold", "Altitude Hold", ByManifest<VRButton, CButton>, CButton.Use, i: 16);
@@ -191,6 +193,22 @@ namespace BYOJoystick.Managers
 
             AddPostUpdateControl("HUD Tint");
             AddPostUpdateControl("HUD Brightness");
+        }
+        
+        protected override void CreateNumPadControls()
+        {
+            NumPadButton("1", "1 / Swap Radio Frequency", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("2", "2 / Set Standby Frequency", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("3", "3 / Set ILS Frequency", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("4", "4 / Set AP Altitude", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("5", "5 / Set AP Heading", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("6", "6 / Set AP Speed", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("7", "7 / Swap MFDs", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("8", "8 / Set TGP Laser Code", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("9", "9 / Set Seeker Code", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("0", "0", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("Enter", "Enter", ByName<VRButton, CButton>, CButton.Use, r: Dash);
+            NumPadButton("Clear", "Clear", ByName<VRButton, CButton>, CButton.Use, r: Dash);
         }
 
         protected override void CreateDisplayControls()
@@ -306,7 +324,8 @@ namespace BYOJoystick.Managers
 
             RadioButton("Radio Channel Cycle", "Radio Channel", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle);
             RadioButton("Radio Channel Team", "Radio Channel", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 0);
-            RadioButton("Radio Channel Global", "Radio Channel", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1);
+            RadioButton("Radio Channel Freq", "Radio Channel", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1);
+            RadioButton("Radio Channel Global", "Radio Channel", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 2);
 
             RadioButton("Radio Mode Cycle", "Radio Mode", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle);
             RadioButton("Radio Mode Next", "Radio Mode", ByName<VRTwistKnobInt, CKnobInt>, CKnobInt.Next);
@@ -355,10 +374,14 @@ namespace BYOJoystick.Managers
             LightsAxis("Instrument Brightness", "Instrument Brightness", ByName<VRTwistKnob, CKnob>, CKnob.Set, i: 0);
             LightsButton("Instrument Brightness Increase", "Instrument Brightness", ByName<VRTwistKnob, CKnob>, CKnob.Increase, i: 0);
             LightsButton("Instrument Brightness Decrease", "Instrument Brightness", ByName<VRTwistKnob, CKnob>, CKnob.Decrease, i: 0);
-
+            
             LightsButton("Nav Lights Toggle", "Navigation Lights", ByManifest<VRLever, CLever>, CLever.Cycle, i: 3);
             LightsButton("Nav Lights On", "Navigation Lights", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 3);
             LightsButton("Nav Lights Off", "Navigation Lights", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 3);
+            
+            LightsButton("Formation Lights Toggle", "Formation Lights", ByName<VRLever, CLever>, CLever.Cycle);
+            LightsButton("Formation Lights On", "Formation Lights", ByName<VRLever, CLever>, CLever.Set, 1);
+            LightsButton("Formation Lights Off", "Formation Lights", ByName<VRLever, CLever>, CLever.Set, 0);
 
             LightsButton("Strobe Lights Toggle", "Strobe Lights", ByManifest<VRLever, CLever>, CLever.Cycle, i: 4);
             LightsButton("Strobe Lights On", "Strobe Lights", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 4);

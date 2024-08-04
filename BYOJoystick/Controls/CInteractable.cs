@@ -21,7 +21,7 @@ namespace BYOJoystick.Controls
             IsMP                 = VTOLMPUtils.IsMultiplayer();
             SyncWrapper          = IsMP ? InteractableSyncWrapper.Create(interactable) : null;
             Pressed              = false;
-            SetInteracting       = CompiledExpressions.CreateFieldSetter<VRInteractable, bool>("interacting");
+            SetInteracting       = CompiledExpressions.CreatePropertySetter<VRInteractable, bool>("interacting");
             SetInteractedOnFrame = CompiledExpressions.CreateFieldSetter<VRInteractable, int>("interactedOnFrame");
         }
 

@@ -97,15 +97,6 @@ namespace BYOJoystick.Managers
             NavButton("A/P Alt Hold", "Altitude AP", ByName<VRInteractable, CInteractable>, CInteractable.Use, r: Cockpit);
             NavButton("A/P Off", "AP Off", ByName<VRInteractable, CInteractable>, CInteractable.Use, r: Cockpit);
 
-            NavButton("A/P Alt Increase", "Alt +", ByManifest<VRButton, CButton>, CButton.Use, i: 13);
-            NavButton("A/P Alt Decrease", "Alt -", ByManifest<VRButton, CButton>, CButton.Use, i: 14);
-
-            NavButton("A/P Hdg Right", "Heading Right", ByManifest<VRButton, CButton>, CButton.Use, i: 15);
-            NavButton("A/P Hdg Left", "Heading Left", ByManifest<VRButton, CButton>, CButton.Use, i: 16);
-
-            NavButton("A/P Crs Right", "Course Right", ByManifest<VRButton, CButton>, CButton.Use, i: 41);
-            NavButton("A/P Crs Left", "Course Left", ByManifest<VRButton, CButton>, CButton.Use, i: 42);
-
             NavButton("Altitude Mode Toggle", "Toggle Altitude Mode", ByType<VehicleMaster, CVehicleMaster>, CVehicleMaster.ToggleAltMode);
             NavButton("Clear Waypoint", "Clear Waypoint", ByManifest<VRButton, CButton>, CButton.Use, i: 8);
         }
@@ -196,6 +187,22 @@ namespace BYOJoystick.Managers
 
             AddPostUpdateControl("HUD Brightness (Front)");
         }
+        
+        protected override void CreateNumPadControls()
+        {
+            NumPadButton("1", "1", NumpadKey, CButton.Use);
+            NumPadButton("2", "2", NumpadKey, CButton.Use);
+            NumPadButton("3", "3", NumpadKey, CButton.Use);
+            NumPadButton("4", "4", NumpadKey, CButton.Use);
+            NumPadButton("5", "5", NumpadKey, CButton.Use);
+            NumPadButton("6", "6", NumpadKey, CButton.Use);
+            NumPadButton("7", "7", NumpadKey, CButton.Use);
+            NumPadButton("8", "8", NumpadKey, CButton.Use);
+            NumPadButton("9", "9", NumpadKey, CButton.Use);
+            NumPadButton("0", "0", NumpadKey, CButton.Use);
+            NumPadButton("Enter", "Enter", NumpadKey, CButton.Use);
+            NumPadButton("Clear", "Clear", NumpadKey, CButton.Use);
+        }
 
         protected override void CreateDisplayControls()
         {
@@ -243,7 +250,8 @@ namespace BYOJoystick.Managers
 
             RadioButton("Radio Channel Cycle", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, i: 2);
             RadioButton("Radio Channel Team", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 0, i: 2);
-            RadioButton("Radio Channel Global", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 2);
+            RadioButton("Radio Channel Freq", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 2);
+            RadioButton("Radio Channel Global", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 2, i: 2);
 
             RadioButton("Radio Mode Cycle", "Radio Mode (Rear)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, i: 1);
             RadioButton("Radio Mode Next", "Radio Mode (Rear)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Next, i: 1);
@@ -295,13 +303,13 @@ namespace BYOJoystick.Managers
             LightsButton("Instrument Brightness Increase", "Instrument Illumination (Front)", ByManifest<VRTwistKnob, CKnob>, CKnob.Increase, i: 7);
             LightsButton("Instrument Brightness Decrease", "Instrument Illumination (Front)", ByManifest<VRTwistKnob, CKnob>, CKnob.Decrease, i: 7);
 
-            LightsButton("Formation Lights Toggle", "Formation Lights (Front)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 7);
-            LightsButton("Formation Lights On", "Formation Lights (Front)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 7);
-            LightsButton("Formation Lights Off", "Formation Lights (Front)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 7);
-
             LightsButton("Nav Lights Toggle", "Nav Lights (Front)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 6);
             LightsButton("Nav Lights On", "Nav Lights (Front)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 6);
             LightsButton("Nav Lights Off", "Nav Lights (Front)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 6);
+            
+            LightsButton("Formation Lights Toggle", "Formation Lights (Front)", ByManifest<VRLever, CLever>, CLever.Cycle, i: 7);
+            LightsButton("Formation Lights On", "Formation Lights (Front)", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 7);
+            LightsButton("Formation Lights Off", "Formation Lights (Front)", ByManifest<VRLever, CLever>, CLever.Set, 0, i: 7);
 
             LightsButton("Strobe Lights Toggle", "Strobe Lights", ByManifest<VRLever, CLever>, CLever.Cycle, i: 5);
             LightsButton("Strobe Lights On", "Strobe Lights", ByManifest<VRLever, CLever>, CLever.Set, 1, i: 5);
@@ -348,6 +356,27 @@ namespace BYOJoystick.Managers
             var cEF24Hotas        = new CEF24Hotas(ef24Hotas, setArmingAAButton, setArmingAGButton);
             Controls.Add(name, cEF24Hotas);
             return cEF24Hotas;
+        }
+        
+        private CButton NumpadKey(string name, string root, bool nullable, bool checkName, int idx)
+        {
+            if (TryGetExistingControl<CButton>(name, out var existingControl))
+                return existingControl;
+            VRInteractable interactable = null;
+            for (int i = 0; i < Interactables.Length; i++)
+            {
+                if (Interactables[i].GetControlReferenceName() != name)
+                    continue;
+                if (Interactables[i].transform.parent.name != "Numpad")
+                    continue;
+                interactable = Interactables[i];
+                break;
+            }
+
+            if (interactable == null)
+                throw new InvalidOperationException($"Interactable {name} not found.");
+            var component = GetComponent<VRButton>(interactable);
+            return ToControl<VRButton, CButton>(name, interactable, component);
         }
     }
 }

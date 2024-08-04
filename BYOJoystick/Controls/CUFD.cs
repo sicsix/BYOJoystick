@@ -7,9 +7,10 @@ namespace BYOJoystick.Controls
         protected readonly MultiObjectSwitcher Switcher;
         protected readonly ObjectPowerUnit     PowerUnit;
         protected readonly CButton             PowerButton;
-        protected readonly CButton             FuelPageButton;   // 0
-        protected readonly CButton             APPageButton;     // 1
-        protected readonly CButton             StatusPageButton; // 2
+        protected readonly CButton             FuelPageButton;
+        protected readonly CButton             APPageButton;
+        protected readonly CButton             StatusPageButton;
+        protected readonly CButton             RadioPageButton;
 
         private CButton _nextButtonPressed;
         private CButton _prevButtonPressed;
@@ -19,7 +20,8 @@ namespace BYOJoystick.Controls
                     CButton             powerButton,
                     CButton             fuelPageButton,
                     CButton             apPageButton,
-                    CButton             statusPageButton)
+                    CButton             statusPageButton,
+                    CButton             radioPageButton)
         {
             Switcher         = switcher;
             PowerUnit        = powerUnit;
@@ -27,6 +29,7 @@ namespace BYOJoystick.Controls
             FuelPageButton   = fuelPageButton;
             APPageButton     = apPageButton;
             StatusPageButton = statusPageButton;
+            RadioPageButton  = radioPageButton;
         }
 
         public void PostUpdate()
@@ -75,6 +78,11 @@ namespace BYOJoystick.Controls
             CButton.Use(c.StatusPageButton, binding, state);
         }
 
+        public static void Radio(CUFD c, Binding binding, int state)
+        {
+            CButton.Use(c.RadioPageButton, binding, state);
+        }
+
         public static void Next(CUFD c, Binding binding, int state)
         {
             if (binding.GetAsBool())
@@ -84,6 +92,8 @@ namespace BYOJoystick.Controls
                 else if (c.Switcher.currIdx == 1)
                     c._nextButtonPressed = c.StatusPageButton;
                 else if (c.Switcher.currIdx == 2)
+                    c._nextButtonPressed = c.RadioPageButton;
+                else if (c.Switcher.currIdx == 3)
                     c._nextButtonPressed = c.FuelPageButton;
                 CButton.Use(c._nextButtonPressed, binding, state);
             }
@@ -99,11 +109,13 @@ namespace BYOJoystick.Controls
             if (binding.GetAsBool())
             {
                 if (c.Switcher.currIdx == 0)
-                    c._prevButtonPressed = c.StatusPageButton;
+                    c._prevButtonPressed = c.RadioPageButton;
                 else if (c.Switcher.currIdx == 1)
                     c._prevButtonPressed = c.FuelPageButton;
                 else if (c.Switcher.currIdx == 2)
                     c._prevButtonPressed = c.APPageButton;
+                else if (c.Switcher.currIdx == 3)
+                    c._prevButtonPressed = c.StatusPageButton;
                 CButton.Use(c._prevButtonPressed, binding, state);
             }
             else if (c._prevButtonPressed != null)

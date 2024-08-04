@@ -139,6 +139,22 @@ namespace BYOJoystick.Managers
 
             AddPostUpdateControl("HMD Brightness (Front)");
         }
+        
+        protected override void CreateNumPadControls()
+        {
+            NumPadButton("1", "1", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("2", "2", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("3", "3", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("4", "4", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("5", "5", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("6", "6", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("7", "7", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("8", "8", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("9", "9", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("0", "0", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("Enter", "Enter", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+            NumPadButton("Clear", "Clear", ByName<VRInteractable, CInteractable>, CInteractable.Use);
+        }
 
         protected override void CreateDisplayControls()
         {
@@ -172,6 +188,7 @@ namespace BYOJoystick.Managers
             DisplayButton("UFD Fuel Page", "UFD", UFD, CUFD.Fuel);
             DisplayButton("UFD Autopilot Page", "UFD", UFD, CUFD.AP);
             DisplayButton("UFD Status Page", "UFD", UFD, CUFD.Status);
+            DisplayButton("UFD Radio Page", "UFD", UFD, CUFD.Radio);
 
             DisplayAxis("MFD Brightness", "MFD Brightness (Front)", ByName<VRTwistKnob, CKnob>, CKnob.Set);
             DisplayButton("MFD Brightness Increase", "MFD Brightness (Front)", ByName<VRTwistKnob, CKnob>, CKnob.Increase);
@@ -257,7 +274,8 @@ namespace BYOJoystick.Managers
 
             RadioButton("Radio Channel Cycle", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, i: 1);
             RadioButton("Radio Channel Team", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 0, i: 1);
-            RadioButton("Radio Channel Global", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 1);
+            RadioButton("Radio Channel Freq", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 1);
+            RadioButton("Radio Channel Global", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 2, i: 1);
 
             RadioButton("Radio Mode Cycle", "Radio Mode (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, i: 0);
             RadioButton("Radio Mode Next", "Radio Mode (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Next, i: 0);
@@ -358,8 +376,12 @@ namespace BYOJoystick.Managers
             var statusPageButton = ByManifest<VRButton, CButton>("UFD Status (Front)", null, false, true, 74);
             if (statusPageButton == null)
                 throw new InvalidOperationException("Could not find UFD status page button");
+            
+            var radioPageButton = ByName<VRButton, CButton>("UFD Radio (Front)", null, false, true, -1);
+            if (radioPageButton == null)
+                throw new InvalidOperationException("Could not find UFD radio page button");
 
-            var cufd = new CUFD(switcher, powerUnit, powerButton, fuelPageButton, apPageButton, statusPageButton);
+            var cufd = new CUFD(switcher, powerUnit, powerButton, fuelPageButton, apPageButton, statusPageButton, radioPageButton);
             Controls.Add(name, cufd);
             return cufd;
         }

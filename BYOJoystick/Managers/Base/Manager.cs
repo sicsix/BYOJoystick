@@ -54,6 +54,7 @@ namespace BYOJoystick.Managers.Base
             CreateNavigationControls();
             CreateSystemsControls();
             CreateHUDControls();
+            CreateNumPadControls();
             CreateDisplayControls();
             CreateRadioControls();
             CreateMusicControls();
@@ -71,6 +72,7 @@ namespace BYOJoystick.Managers.Base
         protected abstract void CreateNavigationControls();
         protected abstract void CreateSystemsControls();
         protected abstract void CreateHUDControls();
+        protected abstract void CreateNumPadControls();
         protected abstract void CreateDisplayControls();
         protected abstract void CreateRadioControls();
         protected abstract void CreateMusicControls();

@@ -462,5 +462,19 @@ namespace BYOJoystick
                 ActiveKeyboardBindings[i].UpdateState(isAnyModifierPressed);
             }
         }
+
+        public void Unload()
+        {
+            ConfigManager.ClearBindings();
+            ManagerLookup.Clear();
+            Managers.Clear();
+            Joysticks.Clear();
+            ConnectedJoysticks.Clear();
+            ActiveJoysticks.Clear();
+            ActiveJoysticksList.Clear();
+            ActiveKeyboardBindings.Clear();
+            Events.Clear();
+            ActiveModifiers.Clear();
+        }
     }
 }

@@ -257,7 +257,7 @@ namespace BYOJoystick.Managers.Base
                     control = new CButton(interactable, button);
                     break;
                 case VRThrottle throttle:
-                    control = new CThrottle(interactable, throttle, IsMulticrew);
+                    control = new CThrottle(Vehicle, interactable, throttle, IsMulticrew);
                     break;
                 case VRDoor door:
                     control = new CDoor(interactable, door);
@@ -375,7 +375,7 @@ namespace BYOJoystick.Managers.Base
             var centerStickRoot = centerStickRootPath != null ? GetGameObject(centerStickRootPath) : null;
             var sideStick       = FindComponent<VRJoystick>(sideStickRoot);
             var centerStick     = centerStickRootPath != null ? FindComponent<VRJoystick>(centerStickRoot) : null;
-            var control         = new CJoystick(sideStick, centerStick, IsMulticrew, true);
+            var control         = new CJoystick(Vehicle, sideStick, centerStick, IsMulticrew, true);
             Controls.Add(name, control);
             return control;
         }
@@ -420,7 +420,7 @@ namespace BYOJoystick.Managers.Base
             var throttle       = FindComponent<VRThrottle>(Vehicle);
             var interactable   = GetInteractable(throttle);
             var tiltController = FindComponent<TiltController>(Vehicle);
-            var control        = new CThrottleTilt(interactable, throttle, tiltController, IsMulticrew);
+            var control        = new CThrottleTilt(Vehicle, interactable, throttle, tiltController, IsMulticrew);
             Controls.Add(name, control);
             return control;
         }

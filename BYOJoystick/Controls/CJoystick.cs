@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using BYOJoystick.Bindings;
 using BYOJoystick.Controls.Converters;
 using BYOJoystick.Controls.Sync;
-using Harmony;
 using UnityEngine;
 using VTOLVR.Multiplayer;
 
@@ -43,7 +42,7 @@ namespace BYOJoystick.Controls
         protected readonly DigitalToAxisSmoothed ThumbstickXSmoothed = new DigitalToAxisSmoothed(0.25f, 1f, 1f);
         protected readonly DigitalToAxisSmoothed ThumbstickYSmoothed = new DigitalToAxisSmoothed(0.25f, 1f, 1f);
 
-        public CJoystick(VRJoystick sideJoystick, VRJoystick centerJoystick, bool isMulticrew, bool hasJoystickAxes)
+        public CJoystick(GameObject vehicle, VRJoystick sideJoystick, VRJoystick centerJoystick, bool isMulticrew, bool hasJoystickAxes)
         {
             Instances.Add(this);
             IsMP                                  = VTOLMPUtils.IsMultiplayer();
@@ -60,8 +59,8 @@ namespace BYOJoystick.Controls
                 return;
             GetRemoteOnly = CompiledExpressions.CreateFieldGetter<VRJoystick, bool>("remoteOnly");
 
-            var connectedJoysticks = VTOLAPI.GetPlayersVehicleGameObject().GetComponentInChildren<ConnectedJoysticks>();
-            var muvs               = VTOLAPI.GetPlayersVehicleGameObject().GetComponent<MultiUserVehicleSync>();
+            var connectedJoysticks = vehicle.GetComponentInChildren<ConnectedJoysticks>();
+            var muvs               = vehicle.GetComponent<MultiUserVehicleSync>();
 
             var sideJoystickInteractable = sideJoystick.GetComponent<VRInteractable>();
             SideJoystickSyncWrapper = InteractableSyncWrapper.Create(sideJoystickInteractable);
@@ -74,42 +73,6 @@ namespace BYOJoystick.Controls
                 CenterJoystickGrabHandler = JoystickGrabHandler.Create(centerJoystick, connectedJoysticks, muvs, centerJoystickInteractable);
             }
         }
-
-        [HarmonyPatch(typeof(ConnectedJoystickSync), nameof(ConnectedJoystickSync.RPC_ForceRelease))]
-        class Patch
-        {
-            static void Prefix(int excludeIdx)
-            {
-                // TODO BUG This should fix the override control on T-55 but never gets called for some reason
-                for (int i = 0; i < Instances.Count; i++)
-                {
-                    var sideJoystickGrabHandler = Instances[i].SideJoystickGrabHandler;
-                    var sideJoystickSyncWrapper = Instances[i].SideJoystickSyncWrapper;
-                    if (sideJoystickGrabHandler != null)
-                    {
-                        if (sideJoystickGrabHandler.ControlIndex == excludeIdx)
-                            continue;
-                        
-                        if (sideJoystickGrabHandler.IsGrabbed)
-                            sideJoystickGrabHandler.ReleaseStick();
-                        sideJoystickSyncWrapper?.StopInteracting(true);
-                    }
-
-                    var centerJoystickGrabHandler = Instances[i].CenterJoystickGrabHandler;
-                    var centerJoystickSyncWrapper = Instances[i].CenterJoystickSyncWrapper;
-                    if (centerJoystickGrabHandler != null)
-                    {
-                        if (centerJoystickGrabHandler.ControlIndex == excludeIdx)
-                            continue;
-                        
-                        if (centerJoystickGrabHandler.IsGrabbed)
-                            centerJoystickGrabHandler.ReleaseStick();
-                        centerJoystickSyncWrapper.StopInteracting(true);
-                    }
-                }
-            }
-        }
-
 
         public void PostUpdate()
         {

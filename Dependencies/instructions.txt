@@ -1,6 +1,6 @@
 Dependencies Needed
 	Assembly-CSharp.dll
-	ModLoader.dll
+	ModLoader.Framework.dll
 	Unity.InputSystem.dll
 	Unity.TextMeshPro.dll
 	UnityEngine.AssetBundleModule.dll
@@ -9,5 +9,5 @@ Dependencies Needed
 	UnityEngine.dll
 	UnityEngine.InputLegacyModule.dll
 	UnityEngine.UI.dll
-	0SharpDX.dll
+	SharpDX.dll
 	SharpDX.DirectInput.dll

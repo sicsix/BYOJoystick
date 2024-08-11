@@ -23,7 +23,7 @@ namespace BYOJoystick.Managers
                 return existingControl;
             var sideStickRoot = GetGameObject(RightJoystick);
             var sideStick     = FindComponent<VRJoystick>(sideStickRoot);
-            var control       = new CJoystick(sideStick, null, IsMulticrew, false);
+            var control       = new CJoystick(Vehicle, sideStick, null, IsMulticrew, false);
             Controls.Add(name, control);
             return control;
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using BYOJoystick.Bindings;
 using BYOJoystick.Controls.Converters;
 using BYOJoystick.Controls.Sync;
-using Harmony;
 using UnityEngine;
 using VTOLVR.Multiplayer;
 
@@ -74,42 +73,6 @@ namespace BYOJoystick.Controls
                 CenterJoystickGrabHandler = JoystickGrabHandler.Create(centerJoystick, connectedJoysticks, muvs, centerJoystickInteractable);
             }
         }
-
-        [HarmonyPatch(typeof(ConnectedJoystickSync), nameof(ConnectedJoystickSync.RPC_ForceRelease))]
-        class Patch
-        {
-            static void Prefix(int excludeIdx)
-            {
-                // TODO BUG This should fix the override control on T-55 but never gets called for some reason
-                for (int i = 0; i < Instances.Count; i++)
-                {
-                    var sideJoystickGrabHandler = Instances[i].SideJoystickGrabHandler;
-                    var sideJoystickSyncWrapper = Instances[i].SideJoystickSyncWrapper;
-                    if (sideJoystickGrabHandler != null)
-                    {
-                        if (sideJoystickGrabHandler.ControlIndex == excludeIdx)
-                            continue;
-                        
-                        if (sideJoystickGrabHandler.IsGrabbed)
-                            sideJoystickGrabHandler.ReleaseStick();
-                        sideJoystickSyncWrapper?.StopInteracting(true);
-                    }
-
-                    var centerJoystickGrabHandler = Instances[i].CenterJoystickGrabHandler;
-                    var centerJoystickSyncWrapper = Instances[i].CenterJoystickSyncWrapper;
-                    if (centerJoystickGrabHandler != null)
-                    {
-                        if (centerJoystickGrabHandler.ControlIndex == excludeIdx)
-                            continue;
-                        
-                        if (centerJoystickGrabHandler.IsGrabbed)
-                            centerJoystickGrabHandler.ReleaseStick();
-                        centerJoystickSyncWrapper.StopInteracting(true);
-                    }
-                }
-            }
-        }
-
 
         public void PostUpdate()
         {

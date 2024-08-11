@@ -3,8 +3,6 @@ using System.IO;
 using System.Reflection;
 using ModLoader.Framework;
 using ModLoader.Framework.Attributes;
-using System.Reflection;
-using Harmony;
 using UnityEngine;
 
 namespace BYOJoystick
@@ -22,9 +20,6 @@ namespace BYOJoystick
         private void Awake()
         {
             Log("Loading BYO Joystick Plugin");
-            
-            Log("Creating Harmony Patches");
-            HarmonyInstance.Create("com.BYOJoystick").PatchAll(Assembly.GetExecutingAssembly());
             
             StartCoroutine(LoadAssetBundle());
         }

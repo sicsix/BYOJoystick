@@ -28,9 +28,6 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="0Harmony">
-          <HintPath>..\Dependencies\0Harmony.dll</HintPath>
-        </Reference>
         <Reference Include="Assembly-CSharp" Publicize="true">
             <HintPath>..\Dependencies\Assembly-CSharp.dll</HintPath>
         </Reference>

@@ -2,7 +2,7 @@
 
 It has a user friendly interface for binding controls on a per aircraft basis and supports both multiplayer and multicrew vehicles.
 
-To download the mod visit https://vtolvr-mods.com/mod/2seuv7za/
+To download the mod visit https://steamcommunity.com/sharedfiles/filedetails/?id=3276352374
 
 CREDITS:
 * frdhog of Triquetra Input for showing what can be done

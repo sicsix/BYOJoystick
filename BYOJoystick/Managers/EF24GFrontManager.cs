@@ -134,6 +134,13 @@ namespace BYOJoystick.Managers
             SystemsButton("Tx Prev", "EF24Hotas", EF24Hotas, CEF24Hotas.PrevTx);
             SystemsButton("Tx Power Increase", "EF24Hotas", EF24Hotas, CEF24Hotas.IncreaseTxPower);
             SystemsButton("Tx Power Decrease", "EF24Hotas", EF24Hotas, CEF24Hotas.DecreaseTxPower);
+            SystemsButton("Tx Start", "EF24Hotas", EF24Hotas, CEF24Hotas.StartTx);
+            SystemsButton("Tx Stop", "EF24Hotas", EF24Hotas, CEF24Hotas.StopTx);
+            SystemsButton("Tx Stop All", "EF24Hotas", EF24Hotas, CEF24Hotas.StopAllTx);
+            SystemsButton("Tx TSD Target", "EF24Hotas", EF24Hotas, CEF24Hotas.TxTSDTarget);
+            SystemsButton("Tx TGP Target", "EF24Hotas", EF24Hotas, CEF24Hotas.TxTGPTarget);
+            SystemsButton("Tx GPS Target", "EF24Hotas", EF24Hotas, CEF24Hotas.TxGPSTarget);
+            SystemsButton("Tx Clear Target", "EF24Hotas", EF24Hotas, CEF24Hotas.TxClearTarget);
 
             SystemsButton("Engine Left Toggle", "Switch Cover (Engine L) (Front)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Cycle, i: 14);
             SystemsButton("Engine Left On", "Switch Cover (Engine L) (Front)", ByManifest<VRLever, CLeverCovered>, CLeverCovered.Set, 1, i: 14);
@@ -253,12 +260,12 @@ namespace BYOJoystick.Managers
             RadioButton("Radio Channel Freq", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 2);
             RadioButton("Radio Channel Global", "Radio Channel (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 2, i: 2);
 
-            RadioButton("Radio Mode Cycle", "Radio Mode (Rear)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, i: 1);
-            RadioButton("Radio Mode Next", "Radio Mode (Rear)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Next, i: 1);
-            RadioButton("Radio Mode Prev", "Radio Mode (Rear)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Prev, i: 1);
-            RadioButton("Radio Mode Hot Mic", "Radio Mode (Rear)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 0, i: 1);
-            RadioButton("Radio Mode PTT", "Radio Mode (Rear)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 1);
-            RadioButton("Radio Mode Off", "Radio Mode (Rear)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 2, i: 1);
+            RadioButton("Radio Mode Cycle", "Radio Mode (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, i: 1);
+            RadioButton("Radio Mode Next", "Radio Mode (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Next, i: 1);
+            RadioButton("Radio Mode Prev", "Radio Mode (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Prev, i: 1);
+            RadioButton("Radio Mode Hot Mic", "Radio Mode (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 0, i: 1);
+            RadioButton("Radio Mode PTT", "Radio Mode (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 1);
+            RadioButton("Radio Mode Off", "Radio Mode (Front)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 2, i: 1);
 
             RadioAxis("Radio Volume", "Command Radio Volume (Front)", ByManifest<VRTwistKnob, CKnob>, CKnob.Set, i: 2);
             RadioButton("Radio Volume Increase", "Command Radio Volume (Front)", ByManifest<VRTwistKnob, CKnob>, CKnob.Increase, i: 2);

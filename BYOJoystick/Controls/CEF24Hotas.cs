@@ -116,6 +116,7 @@ namespace BYOJoystick.Controls
             if (binding.GetAsBool())
                 c.EF24Hotas.ead.MFD_GPSTarget();
         }
+
         public static void TxClearTarget(CEF24Hotas c, Binding binding, int state)
         {
             if (binding.GetAsBool())

@@ -80,7 +80,49 @@ namespace BYOJoystick.Controls
             else
                 c.PowerSmoothed.DecreaseButtonUp();
         }
-        
+
+        public static void StartTx(CEF24Hotas c, Binding binding, int state)
+        {
+            if (binding.GetAsBool())
+                c.EF24Hotas.ead.MFD_StartJam();
+        }
+
+        public static void StopTx(CEF24Hotas c, Binding binding, int state)
+        {
+            if (binding.GetAsBool())
+                c.EF24Hotas.ead.MFD_StopJam();
+        }
+
+        public static void StopAllTx(CEF24Hotas c, Binding binding, int state)
+        {
+            if (binding.GetAsBool())
+                c.EF24Hotas.ead.MFD_StopAll();
+        }
+
+        public static void TxTSDTarget(CEF24Hotas c, Binding binding, int state)
+        {
+            if (binding.GetAsBool())
+                c.EF24Hotas.ead.MFD_TSDTarget();
+        }
+
+        public static void TxTGPTarget(CEF24Hotas c, Binding binding, int state)
+        {
+            if (binding.GetAsBool())
+                c.EF24Hotas.ead.MFD_TGPTarget();
+        }
+
+        public static void TxGPSTarget(CEF24Hotas c, Binding binding, int state)
+        {
+            if (binding.GetAsBool())
+                c.EF24Hotas.ead.MFD_GPSTarget();
+        }
+
+        public static void TxClearTarget(CEF24Hotas c, Binding binding, int state)
+        {
+            if (binding.GetAsBool())
+                c.EF24Hotas.ead.MFD_ClearTarget();
+        }
+
         public static void ToggleArmingMode(CEF24Hotas c, Binding binding, int state)
         {
             if (binding.GetAsBool())

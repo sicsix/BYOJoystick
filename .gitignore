@@ -6,8 +6,9 @@
 # VTOL VR mod dependencies
 
 Dependencies/*
-!Dependencies/0SharpDX.dll
+!Dependencies/SharpDX.dll
 !Dependencies/SharpDX.DirectInput.dll
+!Dependencies/make-symlinks.bat
 !Dependencies/instructions.txt
 
 # User-specific files

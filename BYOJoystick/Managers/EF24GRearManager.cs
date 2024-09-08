@@ -80,6 +80,13 @@ namespace BYOJoystick.Managers
             SystemsButton("Tx Prev", "EF24Hotas", EF24Hotas, CEF24Hotas.PrevTx);
             SystemsButton("Tx Power Increase", "EF24Hotas", EF24Hotas, CEF24Hotas.IncreaseTxPower);
             SystemsButton("Tx Power Decrease", "EF24Hotas", EF24Hotas, CEF24Hotas.DecreaseTxPower);
+            SystemsButton("Tx Start", "EF24Hotas", EF24Hotas, CEF24Hotas.StartTx);
+            SystemsButton("Tx Stop", "EF24Hotas", EF24Hotas, CEF24Hotas.StopTx);
+            SystemsButton("Tx Stop All", "EF24Hotas", EF24Hotas, CEF24Hotas.StopAllTx);
+            SystemsButton("Tx TSD Target", "EF24Hotas", EF24Hotas, CEF24Hotas.TxTSDTarget);
+            SystemsButton("Tx TGP Target", "EF24Hotas", EF24Hotas, CEF24Hotas.TxTGPTarget);
+            SystemsButton("Tx GPS Target", "EF24Hotas", EF24Hotas, CEF24Hotas.TxGPSTarget);
+            SystemsButton("Tx Clear Target", "EF24Hotas", EF24Hotas, CEF24Hotas.TxClearTarget);
 
             SystemsButton("Radar Power Toggle", "Radar Power (Rear)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Cycle, i: 10);
             SystemsButton("Radar Power On", "Radar Power (Rear)", ByManifest<VRTwistKnobInt, CKnobInt>, CKnobInt.Set, 1, i: 10);
